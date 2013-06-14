@@ -22,12 +22,6 @@ MESSAGE (STATUS "*** Staging to build ${PACKAGE_NAME} ***")
 
 #SET(CMAKE_BUILD_TYPE Debug)
 
-#  Set the corect variables for stand-alone PlugIn building
-IF (PREFIX)
-	SET(CMAKE_INSTALL_PREFIX ${PREFIX})
-ENDIF (PREFIX)
-
-SET(PARENT opencpn)
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/src)
 
@@ -76,14 +70,18 @@ FIND_PACKAGE(OpenGL REQUIRED)
 SET(SRC_GRADAR
             src/gradar_pi.h
             src/gradar_pi.cpp
+            src/gradardialog.cpp
+            src/gradardialog.h
+            src/GRadarUI.cpp
+            src/GRadarUI.h
 )
 ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_GRADAR})
 
 
 IF(WIN32)
-  SET(OPENCPN_IMPORT_LIB "../opencpn_cmake2010/${CMAKE_CFG_INTDIR}/${PARENT}")
+  SET(OPENCPN_IMPORT_LIB "../../${CMAKE_CFG_INTDIR}/${PARENT}")
   TARGET_LINK_LIBRARIES( ${PACKAGE_NAME} ${OPENCPN_IMPORT_LIB} )
-#  ADD_DEPENDENCIES(${PACKAGE_NAME} ${PARENT})
+  ADD_DEPENDENCIES(${PACKAGE_NAME} ${PARENT})
 ENDIF(WIN32)
 
 TARGET_LINK_LIBRARIES( ${PACKAGE_NAME} ${wxWidgets_LIBRARIES} ${OPENGL_LIBRARIES})
@@ -99,8 +97,7 @@ INSTALL(TARGETS ${PACKAGE_NAME} RUNTIME LIBRARY DESTINATION "/usr/local/lib/open
 ENDIF(UNIX)
 
 IF(WIN32)
-INSTALL(TARGETS ${PACKAGE_NAME} RUNTIME DESTINATION "c:/Program Files/opencpn/plugins")
-INSTALL(TARGETS ${PACKAGE_NAME} RUNTIME DESTINATION "E:/opencpn_cmake2008/plugins")
+INSTALL(TARGETS ${PACKAGE_NAME} RUNTIME DESTINATION "plugins")
 ENDIF(WIN32)
 
 # find src/ -name \*.cpp -or -name \*.c -or -name \*.h -or -name \*.hpp >po/POTFILES.in
