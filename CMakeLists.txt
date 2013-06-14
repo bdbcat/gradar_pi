@@ -20,7 +20,7 @@ SET(PACKAGE_NAME gradar_pi)
 SET(PLUGIN_SOURCE_DIR .)
 MESSAGE (STATUS "*** Staging to build ${PACKAGE_NAME} ***")
 
-SET(CMAKE_BUILD_TYPE Debug)
+#SET(CMAKE_BUILD_TYPE Debug)
 
 #  Set the corect variables for stand-alone PlugIn building
 IF (PREFIX)

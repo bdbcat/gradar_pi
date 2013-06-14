@@ -46,14 +46,14 @@
 #endif
 
 #ifdef __WXGTK__
-//#include "/home/dsr/Projects/opencpn_sf/opencpn/include/ocpn_plugin.h"
+#include "/home/dsr/Projects/opencpn_sf/opencpn/include/ocpn_plugin.h"
 #endif
 
 #ifdef __WXMSW__
 //#include "../../opencpn_sf/opencpn/include/ocpn_plugin.h"
 #endif
 
-#include "ocpn_plugin.h"
+//#include "ocpn_plugin.h"
 
 enum {
         ID_TEXTCTRL1 =            10000,
