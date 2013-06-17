@@ -49,7 +49,7 @@ ENDIF(WIN32)
 
 
 IF(NOT DEFINED wxWidgets_USE_FILE)
-  SET(wxWidgets_USE_LIBS base core net xml html adv)
+  SET(wxWidgets_USE_LIBS base core net xml adv)
   SET(BUILD_SHARED_LIBS TRUE)
   SET( wxWidgets_USE_DEBUG OFF)
   SET( wxWidgets_USE_UNICODE ON)
