@@ -342,7 +342,7 @@ bool gradar_pi::DeInit(void)
         wxSleep(1);
         timeout--;
     }
-    printf("Thread stopped in %d seconds\n", max_timeout - timeout);
+//    printf("Thread stopped in %d seconds\n", max_timeout - timeout);
 
     //  Cannot delete until PlugIn dtor (wheich never happens)
     //	delete m_pdeficon;
@@ -798,7 +798,7 @@ void gradar_pi::RenderRadarOverlayFull(wxPoint radar_center, double v_scale_ppm,
     if(g_static_timestamp.IsValid() && g_texture_timestamp.IsValid()) {
         if(g_static_timestamp.IsLaterThan(g_texture_timestamp)) {
 
-            printf("Create Texture\n");
+//            printf("Create Texture\n");
             // First approach...
             // If no FBO available....
             // Render the image to a bitmap, convert to image, then convert to texture
@@ -837,7 +837,7 @@ void gradar_pi::RenderRadarOverlayFull(wxPoint radar_center, double v_scale_ppm,
                 hpot = hpot | hpot >> i;
             hpot++;
 
-            printf("wpot hpot %d %d\n", wpot, hpot);
+//            printf("wpot hpot %d %d\n", wpot, hpot);
 
             //  Case:
             //  The data is in the red channel, and we want a transparent overlay
@@ -1115,7 +1115,7 @@ void gradar_pi::RadarTxOff(void)
     destaddr.Hostname(_T("172.16.2.0"));
     m_out_sock101->SendTo(destaddr, &pck, sizeof(pck));
 
-    printf("TX Off\n");
+//    printf("TX Off\n");
     grLogMessage(_T("TX Off\n"));
 
     switch(g_radar_state) {
@@ -1162,7 +1162,7 @@ void gradar_pi::RadarTxOn(void)
     destaddr.Hostname(_T("172.16.2.0"));
     m_out_sock101->SendTo(destaddr, &pck, sizeof(pck));
 
-    printf("TX On\n");
+//    printf("TX On\n");
     grLogMessage(_T("TX On\n"));
 }
 
@@ -1254,7 +1254,7 @@ void gradar_pi::UpdateState(void)
 {
     g_pseudo_tick++;
 
-    printf("UpdateState:  Plugin state: %d   Scanner state:  %d \n", g_radar_state, g_scanner_state);
+//    printf("UpdateState:  Plugin state: %d   Scanner state:  %d \n", g_radar_state, g_scanner_state);
 
     wxString scan_state;
     wxString plug_state;
@@ -1325,7 +1325,7 @@ void gradar_pi::UpdateState(void)
 
     //    Auto state switching is only needed in master mode
     if(g_bmaster) {
-        int current_state = g_radar_state;
+//        int current_state = g_radar_state;
 
         switch (g_scanner_state)
         {
@@ -1346,8 +1346,8 @@ void gradar_pi::UpdateState(void)
             break;
         }
 
-        if(current_state != g_radar_state)
-            printf("  >>>Switch to state: %d\n", g_radar_state);
+//        if(current_state != g_radar_state)
+//            printf("  >>>Switch to state: %d\n", g_radar_state);
     }
 
 
@@ -1451,7 +1451,7 @@ void gradar_pi::Select_Range(double range_nm)
     destaddr.Hostname(_T("172.16.2.0"));
     m_out_sock101->SendTo(destaddr, &pck, sizeof(pck));
 
-    printf("SelectRange(): %g\n", range_nm);
+//    printf("SelectRange(): %g\n", range_nm);
 
     wxString msg;
     msg.Printf(_T("SelectRange: %g nm\n"), range_nm);
@@ -1964,12 +1964,12 @@ void* MulticastRXThread::Entry()
     //http://ho.runcode.us/q/how-to-set-up-a-socket-for-udp-multicast-with-2-network-cards-present
     wxString msg;
     if(bam) {
-        printf("Successfully added to multicast group \n");
+//        printf("Successfully added to multicast group \n");
 
         msg = _T("->gradar_pi: Successfully added to multicast group ");
     }
     else {
-        printf("   Failed to add to multicast group \n");
+//        printf("   Failed to add to multicast group \n");
         msg = _T("   ->gradar_pi: Failed to add to multicast group ");
     }
 
@@ -1983,11 +1983,38 @@ void* MulticastRXThread::Entry()
     rx_addr.Hostname(_T("0.0.0.0"));          // any address will do here,
     // just so long as it looks like an IP
 
+    //  In the case that the scanner is not powered up, there will be no packets from it.
+    //  In this case, the time-out value of 5 seconds delays the smooth shutdown of the thread,
+    //  for no good purpose.
 
-    //    The big while....
+    //  To avoid this annoyance, poll the socket at 1 second timout until something is heard.
+    //  Then switch to a longer timout
+
     bool not_done = true;
     int n_rx_once = 0;
-    m_sock->SetTimeout(5);
+    m_sock->SetTimeout(1);
+    while(0 == n_rx_once)
+    {
+        if(TestDestroy())
+        {
+            goto thread_exit;
+        }
+
+        m_sock->RecvFrom(rx_addr, buf, sizeof(buf));
+        //       printf(" bytes read %d\n", m_sock->LastCount());
+
+        if(m_sock->LastCount()) {
+            wxLogMessage(_T("->gradar_pi: First Packet Rx"));
+            n_rx_once++;
+
+            process_buffer();
+        }
+    }
+
+
+
+    //    The big while....
+     m_sock->SetTimeout(5);
     while((not_done))
     {
         if(TestDestroy())
@@ -2000,10 +2027,6 @@ void* MulticastRXThread::Entry()
         //       printf(" bytes read %d\n", m_sock->LastCount());
 
         if(m_sock->LastCount()) {
-            if(0 == n_rx_once) {
-                wxLogMessage(_T("->gradar_pi: First Packet Rx"));
-                n_rx_once++;
-            }
             process_buffer();
         }
     }
@@ -2042,13 +2065,13 @@ void MulticastRXThread::process_buffer(void)
                 }
 
                 //    Range
-                double range_nm = (packet.range_meters+1) / 1852.;
+//                double range_nm = (packet.range_meters+1) / 1852.;
 
                 // Range change?
                 if(g_range_meters != packet.range_meters + 1)
                 {
-                    printf("Scan Packet...\n Range: %g NM\n range_meters: %d\n bytes: %d\n bytes_1:%d\n",
-                        range_nm, packet.range_meters, packet.scan_length_bytes, packet.display_meters);
+//                    printf("Scan Packet...\n Range: %g NM\n range_meters: %d\n bytes: %d\n bytes_1:%d\n",
+//                        range_nm, packet.range_meters, packet.scan_length_bytes, packet.display_meters);
 
                     if(g_scan_buf)
                         memset(g_scan_buf, 0, g_max_scan_length_bytes * 360);
@@ -2088,7 +2111,7 @@ void MulticastRXThread::process_buffer(void)
                     }
 
                     memcpy(g_static_buf, g_scan_buf, packet.scan_length_bytes * 360);
-                    printf("Static copy\n");
+//                    printf("Static copy\n");
                     g_static_timestamp = wxDateTime::Now();
                     g_static_scan_length_bytes = g_current_scan_length_bytes;
                     g_static_scan_meters = g_scan_meters;
@@ -2103,7 +2126,7 @@ void MulticastRXThread::process_buffer(void)
             memcpy(&packet, buf, sizeof(rad_status_pkt));
             g_scanner_state = packet.parm1;
             g_warmup_timer = packet.parm2;
-            printf("  0x2a5:  state: %d\n", packet.parm1);
+//            printf("  0x2a5:  state: %d\n", packet.parm1);
             break;
         }
 
