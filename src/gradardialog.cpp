@@ -68,6 +68,13 @@ void ControlDialog::OnMove ( wxMoveEvent& event )
 void ControlDialog::OnOperatingModeClick(wxCommandEvent &event)
 {
     pPlugIn->SetOperatingMode(pOperatingMode->GetSelection());
+
+    //  The PlugIn may override the selection and prevent Master Mode
+    if(g_bmaster)
+        pOperatingMode->SetSelection(0);
+    else
+        pOperatingMode->SetSelection(1);
+
 }
 
 void ControlDialog::OnUpdateModeClick(wxCommandEvent &event)

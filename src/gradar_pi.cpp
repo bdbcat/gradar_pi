@@ -24,12 +24,24 @@
 *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 ***************************************************************************
 */
+#ifdef _WINDOWS
+#include "winsock2.h"
+#endif
 
 #include "wx/wxprec.h"
 
 #ifndef  WX_PRECOMP
 #include "wx/wx.h"
 #endif //precompiled headers
+
+#ifdef __WXMSW__
+#include "winsock2.h"
+#include "Ws2ipdef.h"
+#include <iphlpapi.h>
+// Link with Iphlpapi.lib
+#pragma comment(lib, "IPHLPAPI.lib")
+#pragma comment(lib, "ws2_32.lib")
+#endif
 
 #include <wx/socket.h>
 #include "wx/apptrait.h"
@@ -41,6 +53,8 @@
 #ifdef __WXGTK__
 #include <netinet/in.h>
 #include <sys/ioctl.h>
+#include <arpa/inet.h>
+#include <net/if.h>
 #endif
 
 #ifdef __WXMSW__
@@ -52,6 +66,10 @@
 #include "gradar_pi.h"
 #include "gradardialog.h"
 #include "GRadarUI.h"
+
+#include <wx/listimpl.cpp>
+WX_DEFINE_LIST(ListOf_interface_descriptor);
+
 
 bool              g_thread_active;
 
@@ -158,6 +176,267 @@ int   g_savescan_FTC_mode;
 int   g_savescan_crosstalk_mode;
 int   g_savescan_dome_speed;
 
+
+bool test(void)
+{
+#ifdef __WXMSW__
+
+#define WORKING_BUFFER_SIZE 15000
+#define MAX_TRIES 3
+
+#define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
+#define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
+
+        /* Declare and initialize variables */
+
+    DWORD dwSize = 0;
+    DWORD dwRetVal = 0;
+
+    unsigned int i = 0;
+
+    // Set the flags to pass to GetAdaptersAddresses
+    ULONG flags = GAA_FLAG_INCLUDE_PREFIX;
+
+    // default to unspecified address family (both)
+    ULONG family = AF_UNSPEC;
+
+    LPVOID lpMsgBuf = NULL;
+
+    PIP_ADAPTER_ADDRESSES pAddresses = NULL;
+    ULONG outBufLen = 0;
+    ULONG Iterations = 0;
+
+    PIP_ADAPTER_ADDRESSES pCurrAddresses = NULL;
+    PIP_ADAPTER_UNICAST_ADDRESS pUnicast = NULL;
+    PIP_ADAPTER_ANYCAST_ADDRESS pAnycast = NULL;
+    PIP_ADAPTER_MULTICAST_ADDRESS pMulticast = NULL;
+    IP_ADAPTER_DNS_SERVER_ADDRESS *pDnServer = NULL;
+    IP_ADAPTER_PREFIX *pPrefix = NULL;
+
+
+    outBufLen = WORKING_BUFFER_SIZE;
+    family = AF_INET;
+
+    do {
+
+        pAddresses = (IP_ADAPTER_ADDRESSES *) MALLOC(outBufLen);
+        if (pAddresses == NULL) {
+            printf
+                ("Memory allocation failed for IP_ADAPTER_ADDRESSES struct\n");
+            exit(1);
+        }
+
+        dwRetVal =
+            GetAdaptersAddresses(family, flags, NULL, pAddresses, &outBufLen);
+
+        if (dwRetVal == ERROR_BUFFER_OVERFLOW) {
+            FREE(pAddresses);
+            pAddresses = NULL;
+        } else {
+            break;
+        }
+
+        Iterations++;
+
+    } while ((dwRetVal == ERROR_BUFFER_OVERFLOW) && (Iterations < MAX_TRIES));
+
+
+
+    if (dwRetVal == NO_ERROR) {
+        // If successful, output some information from the data we received
+        pCurrAddresses = pAddresses;
+        while (pCurrAddresses) {
+            printf("\tLength of the IP_ADAPTER_ADDRESS struct: %ld\n",
+                   pCurrAddresses->Length);
+            printf("\tIfIndex (IPv4 interface): %u\n", pCurrAddresses->IfIndex);
+            printf("\tAdapter name: %s\n", pCurrAddresses->AdapterName);
+
+            pUnicast = pCurrAddresses->FirstUnicastAddress;
+            if (pUnicast != NULL) {
+                for (i = 0; pUnicast != NULL; i++){
+                    SOCKET_ADDRESS sa = pUnicast->Address;
+                    LPSOCKADDR pska = sa.lpSockaddr;
+                    struct sockaddr_in *their_inaddr_ptr = (struct sockaddr_in *)pska;
+                    char *p = inet_ntoa(their_inaddr_ptr->sin_addr);
+
+                    pUnicast = pUnicast->Next;
+                }
+                printf("\tNumber of Unicast Addresses: %d\n", i);
+            } else
+                printf("\tNo Unicast Addresses\n");
+
+
+        }
+    }
+//http://stackoverflow.com/questions/4139405/how-to-know-ip-address-for-interfaces-in-c
+
+#endif
+    return true;
+}
+
+
+int BuildInterfaceList(ListOf_interface_descriptor &list)
+{
+
+#ifdef __WXMSW__
+    WSADATA WinsockData;
+    if (WSAStartup(MAKEWORD(2, 2), &WinsockData) != 0){
+        grLogMessage(_T("WSAStartup failed, no network interfaces detectable\n"));
+        WSACleanup();
+        return 1;
+    }
+
+
+    SOCKET sd = WSASocket(AF_INET, SOCK_DGRAM, 0, 0, 0, 0);
+    if (sd == SOCKET_ERROR) {
+        grLogMessage(_T("WSASocket failed, no network interfaces detectable\n"));
+        WSACleanup();
+        return 2;
+    }
+
+    INTERFACE_INFO InterfaceList[20];
+    unsigned long nBytesReturned;
+    if (WSAIoctl(sd, SIO_GET_INTERFACE_LIST, 0, 0, &InterfaceList,
+                        sizeof(InterfaceList), &nBytesReturned, 0, 0) == SOCKET_ERROR) {
+        grLogMessage(_T("WSAIoctl failed, no network interfaces detectable\n"));
+        WSACleanup();
+        return 3;
+    }
+
+    int nNumInterfaces = nBytesReturned / sizeof(INTERFACE_INFO);
+    for (int i = 0; i < nNumInterfaces; ++i) {
+        interface_descriptor *pid = new interface_descriptor;
+
+        //      The unicast address
+        sockaddr_in *pAddress;
+        pAddress = (sockaddr_in *) & (InterfaceList[i].iiAddress);
+        char *p = inet_ntoa(pAddress->sin_addr);
+        pid->ip_dot = wxString(p, wxConvUTF8);
+        pid->ip = inet_addr(p); //ip_addr.s_addr;
+
+
+//        pAddress = (sockaddr_in *) & (InterfaceList[i].iiBroadcastAddress);
+//        cout << " has bcast " << inet_ntoa(pAddress->sin_addr);
+
+        //      The netmask
+        pAddress = (sockaddr_in *) & (InterfaceList[i].iiNetmask);
+        char *mask = inet_ntoa(pAddress->sin_addr);
+        pid->netmask_dot = wxString(mask, wxConvUTF8);
+        pid->netmask = inet_addr(mask);//tmp.s_addr;
+
+        // Calculate the mask in cidr notation
+        unsigned long b = inet_addr("255.255.255.255" );
+        unsigned long c = pid->netmask ^ b;
+        int acc = 0;
+        while(c){
+            acc++;
+            c <<= 1;
+        }
+        pid->cidr = 32-acc;
+
+
+        list.Append(pid);
+//        cout << " Iface is ";
+//        u_long nFlags = InterfaceList[i].iiFlags;
+//        if (nFlags & IFF_UP) cout << "up";
+//        else                 cout << "down";
+//        if (nFlags & IFF_POINTTOPOINT) cout << ", is point-to-point";
+//        if (nFlags & IFF_LOOPBACK)     cout << ", is a loopback iface";
+//        cout << ", and can do: ";
+//        if (nFlags & IFF_BROADCAST) cout << "bcast ";
+//        if (nFlags & IFF_MULTICAST) cout << "multicast ";
+//        cout << endl;
+    }
+
+    WSACleanup();
+    return 0;
+#else
+#define INT_TO_ADDR(_addr) \
+(_addr & 0xFF), \
+(_addr >> 8 & 0xFF), \
+(_addr >> 16 & 0xFF), \
+(_addr >> 24 & 0xFF)
+
+    struct ifconf ifc;
+    struct ifreq ifr[10];
+    int sd, ifc_num, addr, mask, i;
+
+    /* Create a socket so we can use ioctl on the file
+     * descriptor to retrieve the interface info.
+     */
+
+    sd = socket(PF_INET, SOCK_DGRAM, 0);
+    if (sd > 0)
+    {
+        ifc.ifc_len = sizeof(ifr);
+        ifc.ifc_ifcu.ifcu_buf = (caddr_t)ifr;
+
+        if (ioctl(sd, SIOCGIFCONF, &ifc) == 0)
+        {
+            ifc_num = ifc.ifc_len / sizeof(struct ifreq);
+//            printf("%d interfaces found\n", ifc_num);
+
+            for (i = 0; i < ifc_num; ++i)
+            {
+                if (ifr[i].ifr_addr.sa_family != AF_INET)
+                {
+                    continue;
+                }
+
+                interface_descriptor *pid = new interface_descriptor;
+
+                /* display the interface name */
+//                printf("%d) interface: %s\n", i+1, ifr[i].ifr_name);
+
+                /* Retrieve the IP address, broadcast address, and subnet mask. */
+                if (ioctl(sd, SIOCGIFADDR, &ifr[i]) == 0)
+                {
+                    addr = ((struct sockaddr_in *)(&ifr[i].ifr_addr))->sin_addr.s_addr;
+//                    printf("%d) address: %d.%d.%d.%d\n", i+1, INT_TO_ADDR(addr));
+                    pid->ip = addr;
+                    wxString dot;
+                    dot.Printf(_T("%d.%d.%d.%d"), INT_TO_ADDR(addr) );
+                    pid->ip_dot = dot;
+                }
+
+//                if (ioctl(sd, SIOCGIFBRDADDR, &ifr[i]) == 0)
+//                {
+//                    bcast = ((struct sockaddr_in *)(&ifr[i].ifr_broadaddr))->sin_addr.s_addr;
+//                    printf("%d) broadcast: %d.%d.%d.%d\n", i+1, INT_TO_ADDR(bcast));
+//                }
+
+                if (ioctl(sd, SIOCGIFNETMASK, &ifr[i]) == 0)
+                {
+                    mask = ((struct sockaddr_in *)(&ifr[i].ifr_netmask))->sin_addr.s_addr;
+//                    printf("%d) netmask: %d.%d.%d.%d\n", i+1, INT_TO_ADDR(mask));
+                    pid->netmask = mask;
+                    wxString dot;
+                    dot.Printf(_T("%d.%d.%d.%d"), INT_TO_ADDR(mask) );
+                    pid->netmask_dot = dot;
+
+                    // Calculate the mask in cidr notation
+                    unsigned long b = inet_addr("255.255.255.255" );
+                    unsigned long c = pid->netmask ^ b;
+                    int acc = 0;
+                    while(c){
+                        acc++;
+                        c <<= 1;
+                    }
+                    pid->cidr = 32-acc;
+                }
+
+                list.Append(pid);
+            }
+        }
+
+        close(sd);
+    }
+
+    return 0;
+
+#endif
+
+}
 
 
 
@@ -271,6 +550,41 @@ int gradar_pi::Init(void)
 
     //    And load the configuration items
     LoadConfig();
+
+       //  Get a list of available network interfaces and associated netmasks
+    BuildInterfaceList(m_interfaces);
+
+    //  Show the interfaces in the log
+    for ( ListOf_interface_descriptor::Node *node = m_interfaces.GetFirst(); node; node = node->GetNext() )
+    {
+        interface_descriptor *current = node->GetData();
+
+        wxString msg(_T("Found network interface: "));
+        msg += current->ip_dot;
+        wxString cidr;
+        cidr.Printf(_T("/%d\n"), current->cidr);
+        msg += cidr;
+        grLogMessage(msg);
+    }
+
+    //  Determine if the standard scanner ip is accessible from this computer,
+    //  using any available interface.
+    //  Note:  The operating system routing table lookup will do something like this
+    //         when a UDP message is to be sent.
+    m_scanner_ip = _T("172.16.2.0");
+    m_bscanner_accessible = CheckHostAccessible( m_scanner_ip );
+
+    wxString msga(_T("Scanner at "));
+    msga += m_scanner_ip;
+
+    if(m_bscanner_accessible)
+        msga += _T(" is accessible.\n");
+    else
+        msga += _T(" is <<NOT>> accessible for master control.\n");
+    grLogMessage(msga);
+
+    if(!m_bscanner_accessible)
+        g_bmaster = false;
 
     // Get a pointer to the opencpn display canvas, to use as a parent for the UI dialog
     m_parent_window = GetOCPNCanvasWindow();
@@ -426,6 +740,24 @@ wxString gradar_pi::GetLongDescription()
 
 }
 
+bool gradar_pi::CheckHostAccessible(wxString &hostname)
+{
+    bool bret = false;
+    long host_ip = inet_addr(hostname.mb_str());
+
+    for ( ListOf_interface_descriptor::Node *node = m_interfaces.GetFirst(); node; node = node->GetNext() )
+    {
+        interface_descriptor *current = node->GetData();
+
+        if((host_ip & current->netmask) == (current->ip & current->netmask)){
+            bret = true;
+            break;
+        }
+    }
+    return bret;
+}
+
+
 void gradar_pi::SetDefaults(void)
 {
     // If the config somehow says NOT to show the icon, override it so the user gets good feedback
@@ -563,6 +895,9 @@ void gradar_pi::OnToolbarToolCallback(int id)
     case RADAR_ACTIVATE:
         if(!g_bmaster)          // slave mode initial state
             g_radar_state = RADAR_TX_ACTIVE;
+        else
+            grLogMessage( _("No scanner activity, continuing search\n") );
+
         break;
 
     default:
@@ -593,7 +928,16 @@ void gradar_pi::DoTick(void)
                     g_static_texture_name = 0;
                 }
 
+                if( RADAR_ACTIVATE != g_radar_state )
+                    grLogMessage( _("No scanner activity, reverting to search\n") );
+
                 g_radar_state = RADAR_ACTIVATE;
+
+            }
+            if(g_scan_packets_per_tick){
+                wxString msg;
+                msg.Printf(_T("Scan packets per tick: %d\n"), g_scan_packets_per_tick );
+                grLogMessage( msg );
             }
 
             g_scan_packets_per_tick = 0;
@@ -752,9 +1096,9 @@ bool gradar_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp)
         if(dist_y > 0.)
             v_scale_ppm = vp->pix_height/(dist_y * 1852.);
 
-        wxString msg;
-        msg.Printf(_T("v_scale_ppm:  %g  Center: %d %d\n"), v_scale_ppm, radar_center.x, radar_center.y);
-        grLogMessage(msg);
+//        wxString msg;
+//        msg.Printf(_T("v_scale_ppm:  %g  Center: %d %d\n"), v_scale_ppm, radar_center.x, radar_center.y);
+//        grLogMessage(msg);
 
         if(g_updatemode == 0) {                   // direct realtime sweep render mode
             RenderRadarOverlaySwept(radar_center, v_scale_ppm, vp);
@@ -1105,17 +1449,14 @@ void gradar_pi::RadarTxOff(void)
 {
     if(!g_bmaster)
         return;
+
     rad_ctl_pkt pck;
     pck.packet_type = 0x2b2;
     pck.len1 = 2;
     pck.parm1 = 1;            // 1 (one) for "off"
 
-    wxIPV4address destaddr;
-    destaddr.Service(_T("50101"));
-    destaddr.Hostname(_T("172.16.2.0"));
-    m_out_sock101->SendTo(destaddr, &pck, sizeof(pck));
+    SendCommand((unsigned char *)&pck, sizeof(pck));
 
-//    printf("TX Off\n");
     grLogMessage(_T("TX Off\n"));
 
     switch(g_radar_state) {
@@ -1131,17 +1472,13 @@ void gradar_pi::RadarTxOff(void)
         g_radar_state = RADAR_ACTIVATE;
         break;
     }
-
-
-    //      wxString msg;
-    //      msg.Printf(_T("Sent Radar Ctl Packet %0X"), parma);
-    //      wxLogMessage(msg);
 }
 
 void gradar_pi::RadarTxOn(void)
 {
     if(!g_bmaster)
         return;
+
     switch(g_radar_state)
     {
     case RADAR_STANDBY:
@@ -1157,13 +1494,16 @@ void gradar_pi::RadarTxOn(void)
     pck.len1 = 2;
     pck.parm1 = 2;            // 2(two) for "on"
 
+    SendCommand((unsigned char *)&pck, sizeof(pck));
+    grLogMessage(_T("TX On\n"));
+}
+
+void gradar_pi::SendCommand(unsigned char *ppkt, unsigned int n_bytes)
+{
     wxIPV4address destaddr;
     destaddr.Service(_T("50101"));
-    destaddr.Hostname(_T("172.16.2.0"));
-    m_out_sock101->SendTo(destaddr, &pck, sizeof(pck));
-
-//    printf("TX On\n");
-    grLogMessage(_T("TX On\n"));
+    destaddr.Hostname(m_scanner_ip);
+    m_out_sock101->SendTo(destaddr, ppkt, n_bytes);
 }
 
 
@@ -1284,7 +1624,7 @@ void gradar_pi::UpdateState(void)
         plug_state = _T("Off");
         break;
     case 1:
-        plug_state = _T("Activate");
+        plug_state = _T("Searching");
         break;
     case 2:
         plug_state = _T("Warmup");
@@ -1307,6 +1647,11 @@ void gradar_pi::UpdateState(void)
     }
 
     wxString msg(_T("UpdateState:  PluginState  "));
+
+    if(g_bmaster)
+        msg += _T("[M]  ");
+    else
+        msg += _T("[S]  ");
 
     msg += plug_state;
     wxString msg2;
@@ -1577,7 +1922,12 @@ void gradar_pi::SetUpdateMode(int mode)
 
 void gradar_pi::SetOperatingMode(int mode)
 {
-    g_bmaster = (mode == 0);
+    if(m_bscanner_accessible)
+        g_bmaster = (mode == 0);
+    else {
+        ShowNoAccessMessage();
+        g_bmaster = false;
+    }
 }
 
 void gradar_pi::SetRangeControlMode(int mode)
@@ -1897,6 +2247,26 @@ bool gradar_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp)
         dlg.ShowModal();
     }
     return false;
+}
+
+void gradar_pi::ShowNoAccessMessage(void)
+{
+    wxString message(_("The Radar Overlay PlugIn is unable to\ndirectly control the radar scanner.\n\n"));
+    message += _("Scanner is located at ip address: ");
+    message += m_scanner_ip;
+    message += _T("\n\n");
+    message += _("Interfaces available on this computer are:\n");
+    for ( ListOf_interface_descriptor::Node *node = m_interfaces.GetFirst(); node; node = node->GetNext() )
+    {
+        interface_descriptor *current = node->GetData();
+        message += current->ip_dot;
+        wxString cidr;
+        cidr.Printf(_T("/%d\n"), current->cidr);
+        message += cidr;
+    }
+
+    wxMessageDialog dlg(GetOCPNCanvasWindow(),  message, _T("gradar_pi message"), wxOK);
+    dlg.ShowModal();
 }
 
 

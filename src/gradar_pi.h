@@ -38,7 +38,7 @@
 
 
 #define     PLUGIN_VERSION_MAJOR    1
-#define     PLUGIN_VERSION_MINOR    0
+#define     PLUGIN_VERSION_MINOR    2
 
 #define     MY_API_VERSION_MAJOR    1
 #define     MY_API_VERSION_MINOR    8
@@ -172,6 +172,22 @@ typedef struct {
 
 #pragma pack(pop)
 
+class interface_descriptor
+{
+public:
+    wxString            ip_dot;
+    wxString            netmask_dot;
+    long                ip;
+    long                netmask;
+    int                 cidr;
+};
+
+WX_DECLARE_LIST(interface_descriptor, ListOf_interface_descriptor);
+
+//      Utility functions
+void grLogMessage(wxString s);
+int BuildInterfaceList(ListOf_interface_descriptor &list);
+
 //    Forward definitions
 class MulticastRXThread;
 class ControlDialog;
@@ -269,6 +285,11 @@ public:
 
 
 private:
+    bool CheckHostAccessible(wxString &hostname);
+    void ShowNoAccessMessage(void);
+
+   void SendCommand(unsigned char *ppkt, unsigned int n_bytes);
+
     void RadarTxOff(void);
     void RadarTxOn(void);
     void UpdateState(void);
@@ -288,6 +309,7 @@ private:
 
     void CacheSetToolbarToolBitmaps(int bm_id_normal, int bm_id_rollover);
 
+    wxString         m_scanner_ip;
     wxFileConfig     *m_pconfig;
     wxWindow         *m_parent_window;
     wxMenu           *m_pmenu;
@@ -329,6 +351,9 @@ private:
     RangeDialog         *m_pRangeDialog;
     NoiseDialog         *m_pNoiseDialog;
     DomeDialog          *m_pDomeDialog;
+
+    ListOf_interface_descriptor         m_interfaces;
+    bool                                m_bscanner_accessible;
 
 };
 
