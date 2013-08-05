@@ -50,7 +50,7 @@
 #include "wx/datetime.h"
 #include <wx/fileconf.h>
 
-#ifdef __WXGTK__
+#ifndef __WXMSW__
 #include <netinet/in.h>
 #include <sys/ioctl.h>
 #include <arpa/inet.h>
@@ -61,6 +61,11 @@
 #include "GL/glu.h"
 #endif
 
+#ifdef __WXOSX__
+  #ifndef ifr_netmask
+  #  define ifr_netmask ifr_addr
+  #endif
+#endif
 
 
 #include "gradar_pi.h"
@@ -137,6 +142,8 @@ int   g_updatemode;           //0:realtime,  1:full screen
 int   g_sweep_count;
 wxDateTime  g_dt_last_tick;
 int   g_scan_packets_per_tick;
+int   g_prev_radar_state;
+int   g_prev_scanner_state;
 
 bool  g_bshown_dc_message;
 wxTextCtrl        *plogtc;
@@ -350,7 +357,10 @@ int BuildInterfaceList(ListOf_interface_descriptor &list)
 
     WSACleanup();
     return 0;
-#else
+#endif
+
+#ifdef __WXGTK__
+
 #define INT_TO_ADDR(_addr) \
 (_addr & 0xFF), \
 (_addr >> 8 & 0xFF), \
@@ -358,7 +368,7 @@ int BuildInterfaceList(ListOf_interface_descriptor &list)
 (_addr >> 24 & 0xFF)
 
     struct ifconf ifc;
-    struct ifreq ifr[10];
+    struct ifreq ifr[20];
     int sd, ifc_num, addr, mask, i;
 
     /* Create a socket so we can use ioctl on the file
@@ -366,15 +376,19 @@ int BuildInterfaceList(ListOf_interface_descriptor &list)
      */
 
     sd = socket(PF_INET, SOCK_DGRAM, 0);
+    if( sd <= 0)
+        grLogMessage(_T("socket failed, no network interfaces detectable\n"));
+
     if (sd > 0)
     {
+        grLogMessage(_T("ioctl test socket successful\n"));
+
         ifc.ifc_len = sizeof(ifr);
         ifc.ifc_ifcu.ifcu_buf = (caddr_t)ifr;
 
         if (ioctl(sd, SIOCGIFCONF, &ifc) == 0)
         {
             ifc_num = ifc.ifc_len / sizeof(struct ifreq);
-//            printf("%d interfaces found\n", ifc_num);
 
             for (i = 0; i < ifc_num; ++i)
             {
@@ -436,6 +450,85 @@ int BuildInterfaceList(ListOf_interface_descriptor &list)
 
 #endif
 
+
+#ifdef __WXOSX__
+#define INT_TO_ADDR(_addr) \
+(_addr & 0xFF), \
+(_addr >> 8 & 0xFF), \
+(_addr >> 16 & 0xFF), \
+(_addr >> 24 & 0xFF)
+
+    int sd;
+    int addr, mask, i;
+
+    /* Create a socket so we can use ioctl on the file
+     * descriptor to retrieve the interface info.
+     */
+
+    sd = socket(PF_INET, SOCK_DGRAM, 0);
+    if( sd <= 0)
+        grLogMessage(_T("socket failed, no network interfaces detectable\n"));
+
+    if (sd > 0)
+    {
+        grLogMessage(_T("ioctl test socket successful\n"));
+
+        struct ifconf conf;
+        char data[4096];
+        struct ifreq *ifr;
+        conf.ifc_len = sizeof(data);
+        conf.ifc_buf = (caddr_t) data;
+        if (ioctl(sd,SIOCGIFCONF,&conf) >=0) {
+            i = 0;
+            ifr = (struct ifreq*)data;
+            while ((char*)ifr < data+conf.ifc_len) {
+
+                switch (ifr->ifr_addr.sa_family) {
+                    case AF_INET:
+                        interface_descriptor *pid = new interface_descriptor;
+
+                /* Retrieve the IP address, broadcast address, and subnet mask. */
+                        if (ioctl(sd, SIOCGIFADDR, ifr) == 0)
+                        {
+                            addr = ((struct sockaddr_in *)(&ifr->ifr_addr))->sin_addr.s_addr;
+                            pid->ip = addr;
+                            wxString dot;
+                            dot.Printf(_T("%d.%d.%d.%d"), INT_TO_ADDR(addr) );
+                            pid->ip_dot = dot;
+                        }
+
+                        if (ioctl(sd, SIOCGIFNETMASK, ifr) == 0)
+                        {
+                            mask = ((struct sockaddr_in *)(&ifr->ifr_netmask))->sin_addr.s_addr;
+                            pid->netmask = mask;
+                            wxString dot;
+                            dot.Printf(_T("%d.%d.%d.%d"), INT_TO_ADDR(mask) );
+                            pid->netmask_dot = dot;
+
+                    // Calculate the mask in cidr notation
+                            unsigned long b = inet_addr("255.255.255.255" );
+                            unsigned long c = pid->netmask ^ b;
+                            int acc = 0;
+                            while(c){
+                                acc++;
+                                c <<= 1;
+                            }
+                            pid->cidr = acc-32;//32-acc;
+                        }
+
+                        list.Append(pid);
+                        break;
+                }
+                ++i;
+                ifr = (struct ifreq*)((char*)ifr +_SIZEOF_ADDR_IFREQ(*ifr));
+            }
+        }
+        close(sd);
+    }
+
+    return 0;
+
+#endif
 }
 
 
@@ -520,6 +613,9 @@ int gradar_pi::Init(void)
     m_sent_bm_id_normal = -1;
     m_sent_bm_id_rollover =  -1;
 
+    g_prev_radar_state = -2;
+    g_prev_scanner_state = -2;
+
     //      m_plogwin = new wxLogWindow(NULL, _T("gradar_pi Log"));
 
 
@@ -553,6 +649,10 @@ int gradar_pi::Init(void)
 
        //  Get a list of available network interfaces and associated netmasks
     BuildInterfaceList(m_interfaces);
+
+    if(!m_interfaces.GetCount()) {
+        grLogMessage(_T("No network interfaces found.\n"));
+    }
 
     //  Show the interfaces in the log
     for ( ListOf_interface_descriptor::Node *node = m_interfaces.GetFirst(); node; node = node->GetNext() )
@@ -934,12 +1034,6 @@ void gradar_pi::DoTick(void)
                 g_radar_state = RADAR_ACTIVATE;
 
             }
-            if(g_scan_packets_per_tick){
-                wxString msg;
-                msg.Printf(_T("Scan packets per tick: %d\n"), g_scan_packets_per_tick );
-                grLogMessage( msg );
-            }
-
             g_scan_packets_per_tick = 0;
         }
     }
@@ -1594,7 +1688,6 @@ void gradar_pi::UpdateState(void)
 {
     g_pseudo_tick++;
 
-//    printf("UpdateState:  Plugin state: %d   Scanner state:  %d \n", g_radar_state, g_scanner_state);
 
     wxString scan_state;
     wxString plug_state;
@@ -1646,27 +1739,38 @@ void gradar_pi::UpdateState(void)
         break;
     }
 
-    wxString msg(_T("UpdateState:  PluginState  "));
+    if((g_radar_state != g_prev_radar_state) || (g_scanner_state != g_prev_scanner_state)) {
+        wxString msg(_T("UpdateState:  PluginState  "));
 
-    if(g_bmaster)
-        msg += _T("[M]  ");
-    else
-        msg += _T("[S]  ");
+        if(g_bmaster)
+            msg += _T("[M]  ");
+        else
+            msg += _T("[S]  ");
 
-    msg += plug_state;
-    wxString msg2;
-    msg2.Printf(_T("  (%d)"), g_radar_state);
-    msg += msg2;
+        msg += plug_state;
+        wxString msg2;
+        msg2.Printf(_T("  (%d)"), g_radar_state);
+        msg += msg2;
 
-    msg += _T("   Scanner state:  ");
+        msg += _T("   Scanner state:  ");
 
-    msg += scan_state;
-    msg2.Printf(_T("  (%d)"), g_scanner_state);
-    msg += msg2;
+        msg += scan_state;
+        msg2.Printf(_T("  (%d)"), g_scanner_state);
+        msg += msg2;
 
-    msg += _T("\n");
+        msg += _T("\n");
 
-    grLogMessage(msg);
+        grLogMessage(msg);
+
+        if(g_scan_packets_per_tick){
+            msg.Printf(_T("Scan packets per tick: %d\n"), g_scan_packets_per_tick );
+            grLogMessage( msg );
+        }
+
+    }
+
+    g_prev_radar_state = g_radar_state;
+    g_prev_scanner_state = g_scanner_state;
 
     //    Auto state switching is only needed in master mode
     if(g_bmaster) {
@@ -2306,7 +2410,7 @@ void* MulticastRXThread::Entry()
     m_sock->SetFlags(wxSOCKET_BLOCK);
 
     //    Subscribe to a multicast group
-    unsigned int a;
+    unsigned int a = 0;
 #ifdef __WXGTK__
     GAddress gaddress;
     _GAddress_Init_INET(&gaddress);
@@ -2324,6 +2428,10 @@ void* MulticastRXThread::Entry()
     a = inet_addr(m_ip.mb_str());
 #endif
 
+#ifdef __WXOSX__
+    a = inet_addr(m_ip.mb_str());
+#endif
+
     struct ip_mreq mreq;
     mreq.imr_multiaddr.s_addr = a;
     mreq.imr_interface.s_addr= INADDR_ANY;    // this should be the RX interface
@@ -2334,17 +2442,15 @@ void* MulticastRXThread::Entry()
     //http://ho.runcode.us/q/how-to-set-up-a-socket-for-udp-multicast-with-2-network-cards-present
     wxString msg;
     if(bam) {
-//        printf("Successfully added to multicast group \n");
-
-        msg = _T("->gradar_pi: Successfully added to multicast group ");
+        msg = _T("Successfully added to multicast group ");
     }
     else {
-//        printf("   Failed to add to multicast group \n");
-        msg = _T("   ->gradar_pi: Failed to add to multicast group ");
+        msg = _T("Failed to add to multicast group ");
     }
 
     msg.Append(m_ip);
-    wxLogMessage(msg);
+    msg.Append(_T("\n"));
+    grLogMessage(msg);
 
     //      tmp = s->buffer_size;
     //      if (setsockopt(udp_fd, SOL_SOCKET, SO_RCVBUF, &tmp, sizeof(tmp)) < 0) {
