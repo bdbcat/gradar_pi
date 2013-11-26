@@ -88,6 +88,11 @@ void ControlDialog::OnUpdateTranSlider(wxScrollEvent &event)
     pPlugIn->UpdateDisplayParameters();
 }
 
+void ControlDialog::OnColorChanged( wxColourPickerEvent& event )
+{
+    pPlugIn->SetScanColor( scancolorpicker->GetColour());
+}
+
 void ControlDialog::OnLogModeClicked(wxCommandEvent &event)
 {
     b_enable_log = pCB_Log->GetValue();
@@ -106,6 +111,11 @@ void ControlDialog::OnNoiseDialogClick(wxCommandEvent& event)
 void ControlDialog::OnDomeDialogClick(wxCommandEvent& event)
 {
     pPlugIn->OnDomeDialogClicked();
+}
+
+void ControlDialog::OnSentryDialogClick(wxCommandEvent& event)
+{
+    pPlugIn->OnSentryDialogClicked();
 }
 
 void ControlDialog::OnIdOKClick ( wxCommandEvent& event )
@@ -399,6 +409,232 @@ void DomeDialog::DomeDialogShow()
     else g_dome_speed = 1;
     DomeSpeedSelect->SetSelection(g_dome_speed);
 
+    Show();
+}
+
+
+
+//////////////////////////SentryDialog////////////////////////////////
+
+
+SentryDialog::SentryDialog( gradar_pi * ppi, wxWindow* parent)
+    : SentryDialogBase( parent )
+{
+    pPlugIn = ppi;
+    pParent = parent;
+
+    this->Connect( wxEVT_MOVE, wxMoveEventHandler( SentryDialog::OnMove ) );
+
+    Init();
+}
+
+
+SentryDialog::~SentryDialog( )
+{
+    this->Disconnect( wxEVT_MOVE, wxMoveEventHandler( SentryDialog::OnMove ) );
+}
+
+void SentryDialog::Init()
+{
+}
+
+void SentryDialog::OnClose( wxCloseEvent& event )
+{
+    pPlugIn->OnSentryDialogClose();
+    event.Skip();
+}
+
+void SentryDialog::OnSize( wxSizeEvent& event )
+{
+    wxSize p = GetSize();
+    pPlugIn->SetSentryDialogSizeX(p.x);
+    pPlugIn->SetSentryDialogSizeY(p.y);
+    event.Skip();
+}
+
+void SentryDialog::OnMove ( wxMoveEvent& event )
+{
+    wxPoint p = GetPosition();
+    pPlugIn->SetSentryDialogX(p.x);
+    pPlugIn->SetSentryDialogY(p.y);
+    event.Skip();
+}
+
+void SentryDialog::OnTimedTransmitClick( wxCommandEvent& event )
+{
+    pPlugIn->SetTimedTransmitMode(TimedTransmit->GetSelection());
+}
+
+void SentryDialog::OnUpdateStandbyMinutes( wxSpinEvent& event )
+{
+    pPlugIn->SetStandbyMinutes(StandbyMinutes->GetValue());
+}
+
+void SentryDialog::OnUpdateTransmitMinutes( wxSpinEvent& event )
+{
+    pPlugIn->SetTransmitMinutes(TransmitMinutes->GetValue());
+}
+
+void SentryDialog::OnGuardZoneClick( wxCommandEvent& event )
+{
+    pPlugIn->SetGuardZoneMode(GuardZoneOnOff->GetSelection());
+    pPlugIn->SetGuardZoneColor( m_colorpicker->GetColour());
+}
+
+void SentryDialog::OnUpdateOuterRange( wxSpinEvent& event )
+{
+    int iran = InnerRange->GetValue();
+    int oran = OuterRange->GetValue();
+    if (oran < iran)
+        oran = iran;
+    OuterRange->SetValue(oran);
+    pPlugIn->SetOuterRange(oran);
+}
+
+
+void SentryDialog::OnUpdateInnerRange( wxSpinEvent& event )
+{
+    int iran = InnerRange->GetValue();
+    int oran = OuterRange->GetValue();
+    if (iran > oran)
+        iran = oran;
+    InnerRange->SetValue(iran);
+    pPlugIn->SetInnerRange(iran);
+}
+
+
+void SentryDialog::OnPartialArcClick( wxCommandEvent& event )
+{
+    pPlugIn->SetPartialArcMode(PartialArcNoYes->GetSelection());
+}
+
+
+void SentryDialog::OnUpdateStartAngle( wxSpinEvent& event )
+{
+    int vale = EndAngle->GetValue();
+    int vals = StartAngle->GetValue();
+    if (vale < vals)
+        vals = vale;
+    if ((vale - vals)>360)
+        vals = vale - 360;
+    StartAngle->SetValue(vals);
+
+    pPlugIn->SetStartAngle(vals);    
+}
+
+
+void SentryDialog::OnUpdateEndAngle( wxSpinEvent& event )
+{
+    int vale = EndAngle->GetValue();
+    int vals = StartAngle->GetValue();
+    if (vale < vals)
+        vale = vals;
+    if ((vale - vals)>360)
+        vale = 360 + vals;
+    EndAngle->SetValue(vale);
+
+    pPlugIn->SetEndAngle(vale);
+}
+
+
+void SentryDialog::OnColorChanged( wxColourPickerEvent& event )
+{
+    pPlugIn->SetGuardZoneColor( m_colorpicker->GetColour());
+}
+
+extern double g_guardzone_transparency;
+
+void SentryDialog::OnUpdateTranSlider(wxScrollEvent &event)
+{
+    g_guardzone_transparency = ((double)pGZTranSlider->GetValue()) / 100.;
+    pPlugIn->UpdateDisplayParameters();
+}
+
+extern int g_sentry_alarm_sensitivity;
+
+void SentryDialog::OnUpdateSensitivitySlider(wxScrollEvent &event)
+{
+    g_sentry_alarm_sensitivity = AlarmSensitivitySlider->GetValue();
+}
+
+
+void SentryDialog::OnSentryCloseClick( wxCommandEvent& event )
+{
+    pPlugIn->OnSentryDialogClose();
+}
+
+extern int g_scan_timed_transmit_mode;
+extern int g_scan_timed_transmit_standby;
+extern int g_scan_timed_transmit_transmit;
+extern int g_timedtransmit_mode;
+extern int g_standby_minutes;
+extern int g_transmit_minutes;
+
+void SentryDialog::SentryDialogShow()
+{
+    g_timedtransmit_mode = g_scan_timed_transmit_mode;
+    TimedTransmit->SetSelection(g_timedtransmit_mode);
+    g_standby_minutes = g_scan_timed_transmit_standby;
+    StandbyMinutes->SetValue(g_standby_minutes);
+    g_transmit_minutes = g_scan_timed_transmit_transmit;
+    TransmitMinutes->SetValue(g_transmit_minutes);
+
+    Show();
+}
+
+
+//////////////////////////SentryAlarmDialog////////////////////////////////
+
+
+SentryAlarmDialog::SentryAlarmDialog( gradar_pi * ppi, wxWindow* parent)
+    : SentryAlarmDialogBase( parent )
+{
+    pPlugIn = ppi;
+    pParent = parent;
+
+    this->Connect( wxEVT_MOVE, wxMoveEventHandler( SentryAlarmDialog::OnMove ) );
+
+    Init();
+}
+
+SentryAlarmDialog::~SentryAlarmDialog( )
+{
+    this->Disconnect( wxEVT_MOVE, wxMoveEventHandler( SentryAlarmDialog::OnMove ) );
+}
+
+void SentryAlarmDialog::Init()
+{
+}
+
+void SentryAlarmDialog::OnClose( wxCloseEvent& event )
+{
+    pPlugIn->OnSentryAlarmDialogClose();
+    event.Skip();
+}
+
+void SentryAlarmDialog::OnSize( wxSizeEvent& event )
+{
+    wxSize p = GetSize();
+    pPlugIn->SetSentryAlarmDialogSizeX(p.x);
+    pPlugIn->SetSentryAlarmDialogSizeY(p.y);
+    event.Skip();
+}
+
+void SentryAlarmDialog::OnMove ( wxMoveEvent& event )
+{
+    wxPoint p = GetPosition();
+    pPlugIn->SetSentryAlarmDialogX(p.x);
+    pPlugIn->SetSentryAlarmDialogY(p.y);
+    event.Skip();
+}
+
+void SentryAlarmDialog::OnAlarmCloseClick( wxCommandEvent& event )
+{
+    pPlugIn->OnSentryAlarmDialogClose();
+}
+
+void SentryAlarmDialog::SentryAlarmDialogShow()
+{
     Show();
 }
 

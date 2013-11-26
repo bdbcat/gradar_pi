@@ -38,7 +38,7 @@
 
 
 #define     PLUGIN_VERSION_MAJOR    1
-#define     PLUGIN_VERSION_MINOR    2
+#define     PLUGIN_VERSION_MINOR    3
 
 #define     MY_API_VERSION_MAJOR    1
 #define     MY_API_VERSION_MINOR    8
@@ -66,8 +66,12 @@ enum {
     BM_ID_RED_SLAVE,
     BM_ID_GREEN,
     BM_ID_GREEN_SLAVE,
+    BM_ID_GREEN_TT,
+    BM_ID_GREEN_SLAVE_TT,
     BM_ID_AMBER,
     BM_ID_AMBER_SLAVE,
+    BM_ID_AMBER_TT,
+    BM_ID_AMBER_SLAVE_TT,
     BM_ID_BLANK,
     BM_ID_BLANK_SLAVE
 
@@ -80,9 +84,16 @@ enum {
     RADAR_ACTIVATE,
     RADAR_IN_TIMED_WARMUP,
     RADAR_STANDBY,
-    RADAR_TX_ACTIVATE,
     RADAR_IN_TIMED_SPINUP,
-    RADAR_TX_ACTIVE
+    RADAR_TX_ACTIVE,
+    RADAR_TT_STANDBY,
+    RADAR_TT_TX_ACTIVE,
+    RADAR_TT_SPINUP
+};
+
+enum {
+    SLAVE_DISPLAY_OFF,
+    SLAVE_DISPLAY_ON
 };
 
 
@@ -105,7 +116,8 @@ typedef struct {
     short             dome_offset;
     unsigned char     FTC_mode;
     unsigned char     crosstalk_onoff;
-    unsigned short    fills[4];
+    unsigned short    fills[2];
+    unsigned char     timed_transmit[4];
     unsigned char     dome_speed;
     unsigned char     fillc[7];
     char              line_data;
@@ -122,7 +134,8 @@ typedef struct {
     short             dome_offset;
     unsigned char     FTC_mode;
     unsigned char     crosstalk_onoff;
-    unsigned short    fills[4];
+    unsigned short    fills[2];
+    unsigned char     timed_transmit[4];
     unsigned char     dome_speed;
     unsigned char     fillc[7];
 }radar_response_pkt;
@@ -198,6 +211,11 @@ class NoiseDialog;
 class NoiseDialogBase;
 class DomeDialog;
 class DomeDialogBase;
+class SentryDialog;
+class SentryDialogBase;
+class SentryAlarmDialog;
+class SentryAlarmDialogBase;
+
 
 //----------------------------------------------------------------------------------------------------------
 //    The PlugIn Class Definition
@@ -235,7 +253,7 @@ public:
     void OnToolbarToolCallback(int id);
 
     // Other public methods
-
+    void UpdateState(void);
     void OnControlDialogClose();
     void OnRangeDialogClose();
     void OnRangeDialogClicked();
@@ -243,8 +261,12 @@ public:
     void OnNoiseDialogClose();
     void OnDomeDialogClicked();
     void OnDomeDialogClose();
+    void OnSentryDialogClicked();
+    void OnSentryDialogClose();
+    void OnSentryAlarmDialogClose();
     void SetUpdateMode(int mode);
     void UpdateDisplayParameters(void);
+    void SetScanColor(wxColour col);
     void SetOperatingMode(int mode);
     void SetRangeControlMode(int mode);
     void SetManualRange(int mode);
@@ -258,6 +280,16 @@ public:
     void SetCrosstalkMode(int mode);
     void SetDomeOffset(int mode);
     void SetDomeSpeed(int mode);
+    void SetTimedTransmitMode(int mode);
+    void SetStandbyMinutes(int mode);
+    void SetTransmitMinutes(int mode);
+    void SetGuardZoneMode(int mode);
+    void SetOuterRange(int mode);
+    void SetInnerRange(int mode);
+    void SetPartialArcMode(int mode);
+    void SetStartAngle(int mode);
+    void SetEndAngle(int mode);
+    void SetGuardZoneColor(wxColour col);
 
     void SetControlDialogX(int x){ m_Control_dialog_x = x; }
     void SetControlDialogY(int y){ m_Control_dialog_y = y; }
@@ -279,6 +311,16 @@ public:
     void SetDomeDialogSizeX(int sx){ m_Dome_dialog_sx = sx; }
     void SetDomeDialogSizeY(int sy){ m_Dome_dialog_sy = sy; }
 
+    void SetSentryDialogX(int x){ m_Sentry_dialog_x = x; }
+    void SetSentryDialogY(int y){ m_Sentry_dialog_y = y; }
+    void SetSentryDialogSizeX(int sx){ m_Sentry_dialog_sx = sx; }
+    void SetSentryDialogSizeY(int sy){ m_Sentry_dialog_sy = sy; }
+
+    void SetSentryAlarmDialogX(int x){ m_Sentry_Alarm_dialog_x = x; }
+    void SetSentryAlarmDialogY(int y){ m_Sentry_Alarm_dialog_y = y; }
+    void SetSentryAlarmDialogSizeX(int sx){ m_Sentry_Alarm_dialog_sx = sx; }
+    void SetSentryAlarmDialogSizeY(int sy){ m_Sentry_Alarm_dialog_sy = sy; }
+
     bool LoadConfig(void);
     bool SaveConfig(void);
 
@@ -288,23 +330,18 @@ private:
     bool CheckHostAccessible(wxString &hostname);
     void ShowNoAccessMessage(void);
 
-   void SendCommand(unsigned char *ppkt, unsigned int n_bytes);
+    void SendCommand(unsigned char *ppkt, unsigned int n_bytes);
 
     void RadarTxOff(void);
     void RadarTxOn(void);
-    void UpdateState(void);
     void DoTick(void);
     bool ChangeCheck(void);
-
     void Select_Range(double range);
-    void RenderRadarBufferDirect(PlugIn_ViewPort *vp);
-    void RenderRadarOverlaySwept(wxPoint radar_center, double v_scale_ppm, PlugIn_ViewPort *vp);
-    void RenderRadarOverlayFull(wxPoint radar_center, double v_scale_ppm, PlugIn_ViewPort *vp);
 
-    void RenderRadarBuffer(unsigned char *buffer, int buffer_line_length, wxDC *pdc,
-        int width, int height);
-    void draw_blob_dc(wxDC &dc, double angle, double radius, double blob_r, double arc_length,
-        double scale, int xoff, int yoff, double ca, double sa);
+    void RenderRadarOverlay(wxPoint radar_center, double v_scale_ppm, PlugIn_ViewPort *vp);
+    void RenderRadarGuardZone(wxPoint radar_center, double v_scale_ppm, PlugIn_ViewPort *vp);
+    void RenderRadarBuffer(unsigned char *buffer, int buffer_line_length, int scan_meters);
+    void RenderGuardZone(void);
     void draw_blob_gl(double angle, double radius, double blob_start, double blob_end, double arc_length, double ca, double sa);
 
     void CacheSetToolbarToolBitmaps(int bm_id_normal, int bm_id_rollover);
@@ -327,7 +364,6 @@ private:
     wxCriticalSection       m_pThreadCS;
 
     wxDatagramSocket   *m_out_sock101;
-    wxDateTime         m_dt_last_render;
 
     int               m_sent_bm_id_normal;
     int               m_sent_bm_id_rollover;
@@ -347,10 +383,18 @@ private:
     int                 m_Dome_dialog_sx, m_Dome_dialog_sy;
     int                 m_Dome_dialog_x, m_Dome_dialog_y;
 
-    ControlDialog        *m_pControlDialog;
+    int                 m_Sentry_dialog_sx, m_Sentry_dialog_sy;
+    int                 m_Sentry_dialog_x, m_Sentry_dialog_y;
+
+    int                 m_Sentry_Alarm_dialog_sx, m_Sentry_Alarm_dialog_sy;
+    int                 m_Sentry_Alarm_dialog_x, m_Sentry_Alarm_dialog_y;
+
+    ControlDialog       *m_pControlDialog;
     RangeDialog         *m_pRangeDialog;
     NoiseDialog         *m_pNoiseDialog;
     DomeDialog          *m_pDomeDialog;
+    SentryDialog        *m_pSentryDialog;
+    SentryAlarmDialog   *m_pSentryAlarmDialog;
 
     ListOf_interface_descriptor         m_interfaces;
     bool                                m_bscanner_accessible;

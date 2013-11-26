@@ -25,10 +25,12 @@ private:
     void OnOperatingModeClick(wxCommandEvent &event);
     void OnUpdateModeClick(wxCommandEvent &event);
     void OnUpdateTranSlider(wxScrollEvent &event);
+    void OnColorChanged( wxColourPickerEvent& event );
     void OnLogModeClicked(wxCommandEvent &event);
     void OnRangeDialogClick(wxCommandEvent &event);
     void OnNoiseDialogClick(wxCommandEvent &event);
     void OnDomeDialogClick(wxCommandEvent &event);
+    void OnSentryDialogClick(wxCommandEvent &event);
     void OnIdOKClick( wxCommandEvent& event );
 
     wxWindow          *pParent;
@@ -101,6 +103,59 @@ private:
     wxWindow        *pParent;
     gradar_pi      *pPlugIn;
 };
+
+class SentryDialog : public SentryDialogBase
+{
+public:
+    SentryDialog(gradar_pi *ppi, wxWindow* parent);
+    ~SentryDialog();
+    void Init();
+    void SentryDialogShow();
+
+private:
+    void OnClose( wxCloseEvent& event );
+    void OnSize( wxSizeEvent& event );
+    void OnMove( wxMoveEvent& event );
+    void OnTimedTransmitClick( wxCommandEvent& event );
+	void OnUpdateStandbyMinutes( wxSpinEvent& event );
+	void OnUpdateTransmitMinutes( wxSpinEvent& event );
+	void OnGuardZoneClick( wxCommandEvent& event );
+	void OnUpdateOuterRange( wxSpinEvent& event );
+	void OnUpdateInnerRange( wxSpinEvent& event );
+	void OnPartialArcClick( wxCommandEvent& event );
+	void OnUpdateStartAngle( wxSpinEvent& event );
+	void OnUpdateEndAngle( wxSpinEvent& event );
+    void OnColorChanged( wxColourPickerEvent& event );
+    void OnUpdateTranSlider(wxScrollEvent& event);
+    void OnUpdateSensitivitySlider(wxScrollEvent& event);
+	void OnSentryCloseClick( wxCommandEvent& event );
+
+
+    wxWindow        *pParent;
+    gradar_pi      *pPlugIn;
+};
+
+class SentryAlarmDialog : public SentryAlarmDialogBase
+{
+public:
+    SentryAlarmDialog(gradar_pi *ppi, wxWindow* parent);
+    ~SentryAlarmDialog();
+    void Init();
+    void SentryAlarmDialogShow();
+
+private:
+    void OnClose( wxCloseEvent& event );
+    void OnSize( wxSizeEvent& event );
+    void OnMove( wxMoveEvent& event );
+//    void OnAlarmSilenceClick( wxCommandEvent& event );
+//    void OnAlarmAckClick( wxCommandEvent& event );    
+	void OnAlarmCloseClick( wxCommandEvent& event );
+
+
+    wxWindow        *pParent;
+    gradar_pi      *pPlugIn;
+};
+
 
 
 

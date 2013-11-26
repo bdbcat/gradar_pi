@@ -144,6 +144,7 @@ wxDateTime  g_dt_last_tick;
 int   g_scan_packets_per_tick;
 int   g_prev_radar_state;
 int   g_prev_scanner_state;
+int   g_slave_display_mode;
 
 bool  g_bshown_dc_message;
 wxTextCtrl        *plogtc;
@@ -160,6 +161,21 @@ int   g_rain_clutter_level;
 int   g_crosstalk_mode;
 int   g_dome_offset;
 int   g_dome_speed;
+int   g_timedtransmit_mode;
+int   g_standby_minutes;
+int   g_transmit_minutes;
+int   g_guardzone_mode;
+int   g_inner_range;
+int   g_outer_range;
+int   g_partial_arc_mode;
+int   g_arc_start_angle;
+int   g_arc_end_angle;
+double g_guardzone_transparency = 0.9;
+int   g_sentry_alarm_sensitivity;
+int   g_zonealarm = 0;
+
+wxColour g_guardzone_color;
+wxColour scol(255, 0, 0);
 
 int   g_scan_range;
 int   g_scan_gain_level;
@@ -170,6 +186,9 @@ int   g_scan_rain_clutter_level;
 int   g_scan_dome_offset;
 int   g_scan_FTC_mode;
 int   g_scan_crosstalk_mode;
+int   g_scan_timed_transmit_mode;
+int   g_scan_timed_transmit_standby;
+int   g_scan_timed_transmit_transmit;
 int   g_scan_dome_speed;
 
 int   g_savescan_range;
@@ -181,7 +200,11 @@ int   g_savescan_rain_clutter_level;
 int   g_savescan_dome_offset;
 int   g_savescan_FTC_mode;
 int   g_savescan_crosstalk_mode;
+int   g_savescan_timed_transmit_mode;
+int   g_savescan_timed_transmit_standby;
+int   g_savescan_timed_transmit_transmit;
 int   g_savescan_dome_speed;
+
 
 
 bool test(void)
@@ -225,7 +248,6 @@ bool test(void)
     family = AF_INET;
 
     do {
-
         pAddresses = (IP_ADAPTER_ADDRESSES *) MALLOC(outBufLen);
         if (pAddresses == NULL) {
             printf
@@ -245,9 +267,7 @@ bool test(void)
 
         Iterations++;
 
-    } while ((dwRetVal == ERROR_BUFFER_OVERFLOW) && (Iterations < MAX_TRIES));
-
-
+     } while ((dwRetVal == ERROR_BUFFER_OVERFLOW) && (Iterations < MAX_TRIES));
 
     if (dwRetVal == NO_ERROR) {
         // If successful, output some information from the data we received
@@ -595,6 +615,8 @@ int gradar_pi::Init(void)
     m_pRangeDialog = NULL;
     m_pNoiseDialog= NULL;
     m_pDomeDialog = NULL;
+    m_pSentryDialog = NULL;
+    m_pSentryAlarmDialog = NULL;
 
     g_updatemode = 0;
     g_radar_state = RADAR_OFF;
@@ -608,6 +630,7 @@ int gradar_pi::Init(void)
     g_overlay_transparency = .50;
     g_sweep_count = 0;
     g_bmaster = true;
+    g_slave_display_mode = SLAVE_DISPLAY_ON;
     g_dt_last_tick = wxDateTime::Now();
     m_ptemp_icon = NULL;
     m_sent_bm_id_normal = -1;
@@ -616,19 +639,11 @@ int gradar_pi::Init(void)
     g_prev_radar_state = -2;
     g_prev_scanner_state = -2;
 
-    //      m_plogwin = new wxLogWindow(NULL, _T("gradar_pi Log"));
-
-
     plogcontainer = new wxDialog(NULL, -1, _T("gradar_pi Log"), wxPoint(0,0), wxSize(600,400),
-        wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER );
+        wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxDIALOG_NO_PARENT | wxSTAY_ON_TOP );
 
     plogtc = new wxTextCtrl(plogcontainer, -1, _T(""), wxPoint(0,0), wxSize(600,400), wxTE_MULTILINE );
-    //      plogcontainer->Show();
 
-    //      plog = new wxLogTextCtrl(m_plogtc);
-
-
-    wxLogMessage(_T("gradar_pi log opened"));
     grLogMessage(_T("gradar_pi log opened\n"));
 
     AddLocaleCatalog( _T("opencpn-gradar_pi") );
@@ -737,11 +752,9 @@ int gradar_pi::Init(void)
 
 bool gradar_pi::DeInit(void)
 {
-    //      printf("gradar_pi DeInit()\n");
-    //      delete _img_radar_pi;
-
     SaveConfig();
 
+    SetTimedTransmitMode(0);
     RadarTxOff();
     {
         wxCriticalSectionLocker enter( m_pThreadCS );
@@ -756,7 +769,6 @@ bool gradar_pi::DeInit(void)
         wxSleep(1);
         timeout--;
     }
-//    printf("Thread stopped in %d seconds\n", max_timeout - timeout);
 
     //  Cannot delete until PlugIn dtor (wheich never happens)
     //	delete m_pdeficon;
@@ -794,6 +806,20 @@ bool gradar_pi::DeInit(void)
     m_pDomeDialog->Close();
     delete m_pDomeDialog;
     m_pDomeDialog = NULL;
+    }
+
+    if(m_pSentryDialog != NULL){
+    m_pSentryDialog->Hide();
+    m_pSentryDialog->Close();
+    delete m_pSentryDialog;
+    m_pSentryDialog = NULL;
+    }
+
+    if(m_pSentryAlarmDialog != NULL){
+    m_pSentryAlarmDialog->Hide();
+    m_pSentryAlarmDialog->Close();
+    delete m_pSentryAlarmDialog;
+    m_pSentryAlarmDialog = NULL;
     }
 
     return true;
@@ -914,6 +940,14 @@ void gradar_pi::OnContextMenuItemCallback(int id)
         m_pDomeDialog->Hide();
     }
     if(m_pDomeDialog->IsShown()) m_pDomeDialog->Hide();
+
+    if (NULL == m_pSentryDialog) {
+        m_pSentryDialog = new SentryDialog(this, m_parent_window);
+        m_pSentryDialog->SetSize(m_Sentry_dialog_x, m_Sentry_dialog_y,
+            m_Sentry_dialog_sx, m_Sentry_dialog_sy);
+        m_pSentryDialog->Hide();
+    }
+    if(m_pSentryDialog->IsShown()) m_pSentryDialog->Hide();
 }
 
 void gradar_pi::OnControlDialogClose()
@@ -957,8 +991,9 @@ void gradar_pi::OnNoiseDialogClose()
     if(m_pNoiseDialog->IsShown())
         m_pNoiseDialog->Hide();
     SaveConfig();
+}
 
-}void gradar_pi::OnDomeDialogClicked()
+void gradar_pi::OnDomeDialogClicked()
 {
     if(m_pDomeDialog->IsShown()) {
         m_pDomeDialog->Hide();
@@ -976,35 +1011,62 @@ void gradar_pi::OnDomeDialogClose()
     SaveConfig();
 }
 
+void gradar_pi::OnSentryDialogClicked()
+{
+    if(m_pSentryDialog->IsShown()) {
+        m_pSentryDialog->Hide();
+    } else {
+        m_pSentryDialog->SetSize(m_Sentry_dialog_x, m_Sentry_dialog_y,
+            m_Sentry_dialog_sx, m_Sentry_dialog_sy);
+        m_pSentryDialog->SentryDialogShow();
+    }
+}
+
+void gradar_pi::OnSentryDialogClose()
+{
+    if(m_pSentryDialog->IsShown())
+        m_pSentryDialog->Hide();
+    SaveConfig();
+}
+
+void gradar_pi::OnSentryAlarmDialogClose()
+{
+    if(m_pSentryAlarmDialog->IsShown())
+        m_pSentryAlarmDialog->Hide();
+    SaveConfig();
+}
+
 void gradar_pi::OnToolbarToolCallback(int id)
 {
-    switch(g_radar_state) {
+    if(g_bmaster){
+        switch(g_radar_state) {
 
-    case RADAR_TX_ACTIVE:
-        RadarTxOff();
-        if(!g_bmaster)          // slave mode turning display off
-            g_radar_state = RADAR_STANDBY;
-        break;
+        case RADAR_TX_ACTIVE:
+            RadarTxOff();
+            break;
 
-    case RADAR_STANDBY:
-        RadarTxOn();
-        if(!g_bmaster)          // slave mode turning display on
-            g_radar_state = RADAR_TX_ACTIVE;
-        break;
+        case RADAR_STANDBY:
+            RadarTxOn();
+            break;
 
-    case RADAR_ACTIVATE:
-        if(!g_bmaster)          // slave mode initial state
-            g_radar_state = RADAR_TX_ACTIVE;
-        else
-            grLogMessage( _("No scanner activity, continuing search\n") );
+        default:
+            break;
+        }
+    }else{
+        switch(g_slave_display_mode) {
 
-        break;
+        case SLAVE_DISPLAY_ON:
+            g_slave_display_mode = SLAVE_DISPLAY_OFF;
+            break;
 
-    default:
-        break;
+        case SLAVE_DISPLAY_OFF:
+            g_slave_display_mode = SLAVE_DISPLAY_ON;
+            break;
+
+        default:
+            break;
+        }
     }
-
-    UpdateState();
 }
 
 void gradar_pi::DoTick(void)
@@ -1013,7 +1075,7 @@ void gradar_pi::DoTick(void)
     if(g_dt_last_tick.IsValid()) {
         wxTimeSpan ts = now.Subtract(g_dt_last_tick);
         double delta_t = ts.GetMilliseconds().ToDouble();
-        if(delta_t > 1000.) {
+        if(delta_t > 6000.) {
             g_dt_last_tick = now;
 
             //    If in slave mode, and no data appears to be coming in,
@@ -1022,11 +1084,6 @@ void gradar_pi::DoTick(void)
 
                 free (g_scan_buf);        // empty the buffer
                 g_scan_buf = 0;
-
-                if(g_static_texture_name) {
-                    glDeleteTextures(1, &g_static_texture_name);
-                    g_static_texture_name = 0;
-                }
 
                 if( RADAR_ACTIVATE != g_radar_state )
                     grLogMessage( _("No scanner activity, reverting to search\n") );
@@ -1085,8 +1142,20 @@ bool gradar_pi::ChangeCheck()
         g_savescan_dome_speed = g_scan_dome_speed;
         change = true;
     }
-    return change;
+    if(g_savescan_timed_transmit_mode != g_scan_timed_transmit_mode){
+        g_savescan_timed_transmit_mode = g_scan_timed_transmit_mode;
+        change = true;
+    }
+    if(g_savescan_timed_transmit_standby != g_scan_timed_transmit_standby){
+        g_savescan_timed_transmit_standby = g_scan_timed_transmit_standby;
+        change = true;
+    }
+    if(g_savescan_timed_transmit_transmit != g_scan_timed_transmit_transmit){
+        g_savescan_timed_transmit_transmit = g_scan_timed_transmit_transmit;
+        change = true;
+    }
 
+    return change;
 }
 
 
@@ -1110,13 +1179,14 @@ bool gradar_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp)
 
         if(m_pDomeDialog)
             if(m_pDomeDialog->IsShown())m_pDomeDialog->DomeDialogShow();
+
+        if(m_pSentryDialog)
+            if(m_pSentryDialog->IsShown())m_pSentryDialog->SentryDialogShow();
     }
 
-    bool b_time_render = true;
 
-    m_dt_last_render = wxDateTime::Now();
-
-    if((g_radar_state == RADAR_TX_ACTIVE) && b_time_render) {
+    if(((g_radar_state == RADAR_TX_ACTIVE)||(g_radar_state == RADAR_TT_TX_ACTIVE)) &&
+        (!(!g_bmaster && (g_slave_display_mode == SLAVE_DISPLAY_OFF)))) {
 //    if(TRUE){
         double max_distance = 0;
         wxPoint radar_center(vp->pix_width/2, vp->pix_height/2);
@@ -1158,6 +1228,7 @@ bool gradar_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp)
 
             // now look in the list of available ranges to find the smallest range
             // that is larger than the required range
+
             range_index  = n_ranges-1;
             req_range = available_ranges[n_ranges-1];
             for (int i= 0 ; i < n_ranges ; i++) {
@@ -1172,13 +1243,13 @@ bool gradar_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp)
         // do we need a switch ?
         if(g_bmaster){
 
-          if(g_selected_range != req_range) {
+            if(g_selected_range != req_range) {
                 g_selected_range = req_range;
                 g_manual_range = range_index;
                 Select_Range(g_selected_range);
                 if(m_pRangeDialog)
                     if(m_pRangeDialog->IsShown())m_pRangeDialog->RangeDialogShow();
-           }
+            }
         }
 
         //    Calculate drawing scale factor
@@ -1190,16 +1261,10 @@ bool gradar_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp)
         if(dist_y > 0.)
             v_scale_ppm = vp->pix_height/(dist_y * 1852.);
 
-//        wxString msg;
-//        msg.Printf(_T("v_scale_ppm:  %g  Center: %d %d\n"), v_scale_ppm, radar_center.x, radar_center.y);
-//        grLogMessage(msg);
+        RenderRadarOverlay(radar_center, v_scale_ppm, vp);
 
-        if(g_updatemode == 0) {                   // direct realtime sweep render mode
-            RenderRadarOverlaySwept(radar_center, v_scale_ppm, vp);
-        } else {                                    // cached full screen render mode
-            RenderRadarOverlayFull(radar_center, v_scale_ppm, vp);
-        }
-
+        if(g_guardzone_mode == 1)
+            RenderRadarGuardZone(radar_center, v_scale_ppm, vp);
 
         return true;
     } else {
@@ -1207,7 +1272,9 @@ bool gradar_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp)
     }
 }
 
-void gradar_pi::RenderRadarOverlaySwept(wxPoint radar_center, double v_scale_ppm, PlugIn_ViewPort *vp)
+
+
+void gradar_pi::RenderRadarOverlay(wxPoint radar_center, double v_scale_ppm, PlugIn_ViewPort *vp)
 {
     glPushAttrib(GL_COLOR_BUFFER_BIT | GL_LINE_BIT | GL_HINT_BIT);      //Save state
     glEnable(GL_BLEND);
@@ -1220,216 +1287,230 @@ void gradar_pi::RenderRadarOverlaySwept(wxPoint radar_center, double v_scale_ppm
     glRotatef(-90., 0, 0, 1);        // first correction
     glRotatef(g_hdt, 0, 0, 1);        // second correction
 
-    // scaling...each scan holds 4 radials
-    double bytes_per_meter = (g_current_scan_length_bytes / 4) / (double)g_scan_meters;
-    double scale_factor =  v_scale_ppm / bytes_per_meter;
-    glScaled( scale_factor, scale_factor, 1. );
+    if(g_updatemode == 0) {
+        // swept scan  scaling...each scan holds 4 radials
+        double bytes_per_meter = (g_current_scan_length_bytes / 4) / (double)g_scan_meters;
+        double scale_factor =  v_scale_ppm / bytes_per_meter;
+        glScaled( scale_factor, scale_factor, 1. );
 
-    RenderRadarBufferDirect(vp);
+        RenderRadarBuffer(g_scan_buf, g_current_scan_length_bytes, g_scan_meters);
+
+    }else{
+        // full scan           scaling...each scan holds 4 radials
+        double bytes_per_meter = (g_static_scan_length_bytes / 4) / (double)g_static_scan_meters;
+        double scale_factor =  v_scale_ppm / bytes_per_meter;
+        glScaled( scale_factor, scale_factor, 1. );
+
+        RenderRadarBuffer(g_static_buf, g_static_scan_length_bytes, g_static_scan_meters);
+    }
+    glPopMatrix();
+    glPopAttrib();            // restore state
+}
+
+
+int sang;
+int eang;
+
+bool onearc(int ang)
+{
+    if ((ang >= sang) && (ang <= eang))
+        return true;
+    else
+        return false;
+}
+
+bool twoarc(int ang)
+{
+    if ((ang >= sang) || (ang <= eang))
+        return true;
+    else
+        return false;
+}
+
+
+void gradar_pi::RenderRadarBuffer(unsigned char *buffer, int buffer_line_length, int scan_meters)
+{
+    if(buffer == 0) return;
+    g_zonealarm = 0;
+    int maxrad = buffer_line_length/4;
+
+    double mtrsperbyte = (double)scan_meters / (double)maxrad;
+    bool zoneangle = true;
+    bool (*checkzoneangle)(int);
+    checkzoneangle = onearc;            // default, prevent compiler warning
+
+    if((g_guardzone_mode == 1) && (g_partial_arc_mode == 1)){
+        sang = g_arc_start_angle;
+        eang = g_arc_end_angle;
+        if ( sang < 0)
+            sang += 360;
+        if ( eang < 0)
+            eang += 360;
+
+        if (eang > sang)
+            checkzoneangle = onearc;
+        else
+            checkzoneangle = twoarc;
+    }
+
+    unsigned char sred = scol.Red();
+    unsigned char sgrn = scol.Green();
+    unsigned char sblu = scol.Blue();
+
+    for(int i=0 ; i < 360 ; i += 2)
+    {
+        unsigned char *packet_data = &buffer[i * buffer_line_length];
+        double angle = i;
+
+        for(int k=0 ; k < 4 ; ++k)
+        {
+            if((g_guardzone_mode == 1) && (g_partial_arc_mode == 1)) {
+                if( checkzoneangle(angle) )
+                    zoneangle = true;
+                else
+                    zoneangle = false;
+            }
+
+            double ca = cos(angle * PI / 180.);
+            double sa = sin(angle * PI / 180.);
+
+            for(int j=0 ; j < maxrad ; ++j)
+            {
+                unsigned char data1 = *packet_data;
+                double rad = j;
+
+                if(data1 != 0){
+                    if((g_guardzone_mode == 1) && zoneangle){
+                        double zrad = double(rad + 0.5) * mtrsperbyte;
+                        if((zrad >= g_inner_range) && (zrad <= g_outer_range))
+                             g_zonealarm ++;
+                    }
+                    double b_start = 0.0;
+                    double b_end = 1.0;
+                    unsigned char alpha = 255 * g_overlay_transparency;
+                    if(data1 != 255){
+                        unsigned char data0 = *(packet_data - 1);
+                        unsigned char data2 = *(packet_data + 1);
+
+                        if((data0 == 255 && data2 != 255)||(data0 != 0 && data2 == 0))
+                            b_end = (double)data1/255.0;
+                        else if((data0  != 255 && data2 == 255)||(data0 == 0 && data2 != 0))
+                            b_start = (double)data1/255.0;
+                        else
+                            alpha = data1 * g_overlay_transparency;
+                    }
+
+                    glColor4ub(sred, sgrn, sblu, alpha);
+                    draw_blob_gl(angle, rad, b_start, b_end, 0.5, ca, sa);
+                }
+                packet_data++;
+            }
+            angle += 0.5;
+        }
+    }
+
+    if(g_zonealarm > g_sentry_alarm_sensitivity) {
+
+        if (NULL == m_pSentryAlarmDialog) {
+            m_pSentryAlarmDialog = new SentryAlarmDialog(this, m_parent_window);
+            m_pSentryAlarmDialog->SetSize(m_Sentry_Alarm_dialog_x, m_Sentry_Alarm_dialog_y,
+                m_Sentry_Alarm_dialog_sx, m_Sentry_Alarm_dialog_sy);
+            m_pSentryAlarmDialog->Show();
+        }
+         m_pSentryAlarmDialog->Show();
+         wxBell();
+    }
+}
+
+
+void gradar_pi::RenderRadarGuardZone(wxPoint radar_center, double v_scale_ppm, PlugIn_ViewPort *vp)
+{
+    glPushAttrib(GL_COLOR_BUFFER_BIT | GL_LINE_BIT | GL_HINT_BIT);      //Save state
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glPushMatrix();
+
+    glTranslated( radar_center.x, radar_center.y, 0);
+
+    glRotatef(-90., 0, 0, 1);        // first correction
+    glRotatef(g_hdt, 0, 0, 1);        // second correction
+
+    glScaled( v_scale_ppm,v_scale_ppm,1.0);
+    RenderGuardZone();
+
     glPopMatrix();
 
     glPopAttrib();            // restore state
 }
 
-void gradar_pi::RenderRadarOverlayFull(wxPoint radar_center, double v_scale_ppm, PlugIn_ViewPort *vp)
+void gradar_pi::RenderGuardZone(void)
 {
-    if(g_static_timestamp.IsValid() && g_texture_timestamp.IsValid()) {
-        if(g_static_timestamp.IsLaterThan(g_texture_timestamp)) {
 
-//            printf("Create Texture\n");
-            // First approach...
-            // If no FBO available....
-            // Render the image to a bitmap, convert to image, then convert to texture
+    int start = 0;
+    int stop = 360;
+    int zone_size = g_outer_range - g_inner_range;
+    unsigned char red = g_guardzone_color.Red();
+    unsigned char green = g_guardzone_color.Green();
+    unsigned char blue = g_guardzone_color.Blue();
+    unsigned char alpha = 255 * g_guardzone_transparency;
+    glColor4ub(red, green, blue, alpha);
 
-            // Do the render at 4x size, to get decent pixelation behavior
-            // Note g_static_scan_length_bytes is already 4x the pixels captured
-            wxBitmap bmp(g_static_scan_length_bytes *2, g_static_scan_length_bytes * 2);
-            wxMemoryDC mdc(bmp);
-            mdc.SetBackground(*wxBLACK_BRUSH);
-            mdc.Clear();
+    if(g_partial_arc_mode == 1)
+    {
+        start = g_arc_start_angle;
+        stop = g_arc_end_angle;
+    }
 
-            RenderRadarBuffer(g_static_buf, g_static_scan_length_bytes, &mdc,
-                bmp.GetWidth(), bmp.GetHeight());
+    for(int i= start ; i < stop; ++i)
+    {
+        double angle = i;
+        double ca = cos( angle * PI / 180.0);
+        double sa = sin( angle * PI / 180.0);
 
-            mdc.SelectObject(wxNullBitmap);
-
-            // Convert bitmap to image
-            wxImage image = bmp.ConvertToImage();
-            //            image.SaveFile(_T("/home/dsr/rad1.jpg"), wxBITMAP_TYPE_JPEG);
-            wxImage image1 = image; //image.Blur(2);
-
-
-
-            // Convert to POT RGBA buffer
-            int w = image.GetWidth(), h = image.GetHeight();
-            // Get next larger POT width/height
-            int wpot = w;
-            int hpot = h;
-            wpot--;
-            for (int i=1; i<16; i<<=1)
-                wpot = wpot | wpot >> i;
-            wpot++;
-
-            hpot--;
-            for (int i=1; i<16; i<<=1)
-                hpot = hpot | hpot >> i;
-            hpot++;
-
-//            printf("wpot hpot %d %d\n", wpot, hpot);
-
-            //  Case:
-            //  The data is in the red channel, and we want a transparent overlay
-            //  with alpha scaled by data intensity and overall transparency value
-            unsigned char *d = image1.GetData();
-            unsigned char *e = new unsigned char[4*wpot*hpot];
-            for(int y=0; y<h; y++) {
-                for(int x=0; x<wpot; x++) {
-                    unsigned char r; //, g, b;
-
-                    if(x < w) {
-                        int soff = (y*w)+x;
-                        r = d[soff*3 + 0];
-                        //                        g = d[soff*3 + 1];
-                        //                        b = d[soff*3 + 2];
-                    } else {
-                        r = 0;
-                    }
-
-                    int doff = (y*wpot)+x;
-                    if(r) {
-                        e[doff*4 + 0] = 255;
-                        e[doff*4 + 1] = 0;
-                        e[doff*4 + 2] = 0;
-                        double ri = (double)r * g_overlay_transparency;
-                        e[doff*4 + 3] = (unsigned char)ri;
-                    } else {
-                        e[doff*4 + 3] = 0;
-                    }
-                }
-            }
-
-
-            glDeleteTextures(1, &g_static_texture_name);
-            glGenTextures(1, &g_static_texture_name);
-            glBindTexture(GL_TEXTURE_2D, g_static_texture_name);
-            glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-            glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-            glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, wpot, hpot, 0, GL_RGBA,
-                GL_UNSIGNED_BYTE, e );
-
-            delete[] e;
-
-            g_tex_width = wpot;
-            g_tex_height = hpot;
-            g_tex_sub_width = w;
-            g_tex_sub_height = h;
-
-            g_texture_timestamp = g_static_timestamp;
-            g_texture_scan_meters = g_static_scan_meters;
-        }
-
-        // Render the texture
-
-        if(g_static_texture_name) {
-            //                printf("Render Texture\n");
-            glBindTexture(GL_TEXTURE_2D, g_static_texture_name);
-
-            //                printf("Tex w/h %d %d %d %d \n", g_tex_width, g_tex_height, g_tex_sub_width, g_tex_sub_height);
-
-            glPushAttrib(GL_COLOR_BUFFER_BIT | GL_LINE_BIT | GL_HINT_BIT);      //Save state
-            glEnable(GL_TEXTURE_2D);
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-            glPushMatrix();
-
-            glTranslated( radar_center.x, radar_center.y, 0);
-            glScaled( 1., 1., 1. );
-            glRotatef(-90., 0, 0, 1);        // first correction
-            glRotatef(g_hdt, 0, 0, 1);        // second correction
-
-            float half_pixels = (double)g_texture_scan_meters * v_scale_ppm;
-            float wt = (double)g_tex_sub_width/g_tex_width;
-            float ht = (double)g_tex_sub_height/g_tex_height;
-
-            //               printf("%g\n", half_pixels);
-            glBegin( GL_QUADS );
-
-            glTexCoord2f( 0., 0. );
-            glVertex2f(-half_pixels, -half_pixels);
-
-            glTexCoord2f( wt, 0. );
-            glVertex2f(half_pixels, -half_pixels);
-
-            glTexCoord2f( wt, ht );
-            glVertex2f(half_pixels, half_pixels);
-
-            glTexCoord2f( 0., ht );
-            glVertex2f(-half_pixels, half_pixels);
-
-            glEnd();
-
-            glDisable(GL_TEXTURE_2D);
-
-            glPopMatrix();
-            glPopAttrib();            // restore state
-        }
+        draw_blob_gl(angle, g_inner_range, 0.0, zone_size, 1.0, ca, sa);
     }
 }
 
 
-void gradar_pi::draw_blob_dc(wxDC &dc, double angle, double radius, double blob_r, double arc_length, double scale, int xoff, int yoff,
-    double ca, double sa)
+void gradar_pi::draw_blob_gl(double angle, double radius, double blob_start, double blob_end, double arc_length, double ca, double sa)
 {
+
     //    Calculate the blob size...
-    double xm1 = (radius - blob_r/2) * ca;
-    double ym1 = (radius - blob_r/2) * sa;
-    double xm2 = (radius + blob_r/2) * ca;
-    double ym2 = (radius + blob_r/2) * sa;
+    double xm1 = (radius + blob_start) * ca;
+    double ym1 = (radius + blob_start) * sa;
+    double xm2 = (radius + blob_end) * ca;
+    double ym2 = (radius + blob_end) * sa;
 
-    double blob_width2 =  (radius *(2.0 * PI)/(360. / arc_length))/2.0;
+    double blob_width_start2 =  ((radius + blob_start) * PI * arc_length / 360);
+    double blob_width_end2 =  ((radius + blob_end) * PI * arc_length / 360);
 
-    double xa = (xm1 + blob_width2 * sa) * scale;
-    double ya = (ym1 - blob_width2 * ca) * scale;
+    double xa = xm1 + blob_width_start2 * sa;
+    double ya = ym1 - blob_width_start2 * ca;
 
-    double xb = (xm2 + blob_width2 * sa) * scale;
-    double yb = (ym2 - blob_width2 * ca) * scale;
+    double xb = xm2 + blob_width_end2 * sa;
+    double yb = ym2 - blob_width_end2 * ca;
 
-    double xc = (xm1 - blob_width2 * sa) * scale;
-    double yc = (ym1 + blob_width2 * ca) * scale;
+    double xc = xm1 - blob_width_start2 * sa;
+    double yc = ym1 + blob_width_start2 * ca;
 
-    double xd = (xm2 - blob_width2 * sa) * scale;
-    double yd = (ym2 + blob_width2 * ca) * scale;
+    double xd = xm2 - blob_width_end2 * sa;
+    double yd = ym2 + blob_width_end2 * ca;
 
-    /*
-    wxPoint p1[4];
-    p1[0].x = wxRound(xa);  p1[0].y = wxRound(ya);
-    p1[1].x = wxRound(xb);  p1[1].y = wxRound(yb);
-    p1[2].x = wxRound(xc);  p1[2].y = wxRound(yc);
-    p1[3].x = wxRound(xd);  p1[3].y = wxRound(yd);
-    dc.DrawPolygon(4, p1, xoff, yoff);
-    */
 
-    wxPoint p1[3];
-    p1[0].x = xa;  p1[0].y = ya;
-    p1[1].x = xb;  p1[1].y = yb;
-    p1[2].x = xc;  p1[2].y = yc;
-    dc.DrawPolygon(3, p1, xoff, yoff);
+    glBegin(GL_TRIANGLES);
+    glVertex2d(xa, ya);
+    glVertex2d(xb, yb);
+    glVertex2d(xc, yc);
 
-    p1[0].x = xb;  p1[0].y = yb;
-    p1[1].x = xc;  p1[1].y = yc;
-    p1[2].x = xd;  p1[2].y = yd;
-    dc.DrawPolygon(3, p1, xoff, yoff);
+    glVertex2f(xb, yb);
+    glVertex2f(xc, yc);
+    glVertex2f(xd, yd);
+    glEnd();
 }
 
 void gradar_pi::SetCursorLatLon(double lat, double lon)
 {
-    /*
-    if(m_pGribDialog)
-    {
-    m_pGribDialog->SetCursorLatLon(lat, lon);
-    }
-    */
 }
 
 bool gradar_pi::LoadConfig(void)
@@ -1462,6 +1543,16 @@ bool gradar_pi::LoadConfig(void)
         m_Dome_dialog_sy = pConf->Read ( _T ( "DomeDialogSizeY" ), 232L );
         m_Dome_dialog_x =  pConf->Read ( _T ( "DomeDialogPosX" ), 161L );
         m_Dome_dialog_y =  pConf->Read ( _T ( "DomeDialogPosY" ), 254L );
+
+        m_Sentry_dialog_sx = pConf->Read ( _T ( "SentryDialogSizeX" ), 157L );
+        m_Sentry_dialog_sy = pConf->Read ( _T ( "SentryDialogSizeY" ), 232L );
+        m_Sentry_dialog_x =  pConf->Read ( _T ( "SentryDialogPosX" ), 161L );
+        m_Sentry_dialog_y =  pConf->Read ( _T ( "SentryDialogPosY" ), 254L );
+
+        m_Sentry_Alarm_dialog_sx = pConf->Read ( _T ( "SentryAlarmDialogSizeX" ), 157L );
+        m_Sentry_Alarm_dialog_sy = pConf->Read ( _T ( "SentryAlarmDialogSizeY" ), 232L );
+        m_Sentry_Alarm_dialog_x =  pConf->Read ( _T ( "SentryAlarmDialogPosX" ), 161L );
+        m_Sentry_Alarm_dialog_y =  pConf->Read ( _T ( "SentryAlarmDialogPosY" ), 254L );
 
 
         return true;
@@ -1500,6 +1591,16 @@ bool gradar_pi::SaveConfig(void)
         pConf->Write ( _T ( "DomeDialogSizeY" ),  m_Dome_dialog_sy );
         pConf->Write ( _T ( "DomeDialogPosX" ),   m_Dome_dialog_x );
         pConf->Write ( _T ( "DomeDialogPosY" ),   m_Dome_dialog_y );
+
+        pConf->Write ( _T ( "SentryDialogSizeX" ),  m_Sentry_dialog_sx );
+        pConf->Write ( _T ( "SentryDialogSizeY" ),  m_Sentry_dialog_sy );
+        pConf->Write ( _T ( "SentryDialogPosX" ),   m_Sentry_dialog_x );
+        pConf->Write ( _T ( "SentryDialogPosY" ),   m_Sentry_dialog_y );
+
+        pConf->Write ( _T ( "SentryAlarmDialogSizeX" ),  m_Sentry_Alarm_dialog_sx );
+        pConf->Write ( _T ( "SentryAlarmDialogSizeY" ),  m_Sentry_Alarm_dialog_sy );
+        pConf->Write ( _T ( "SentryAlarmDialogPosX" ),   m_Sentry_Alarm_dialog_x );
+        pConf->Write ( _T ( "SentryAlarmDialogPosY" ),   m_Sentry_Alarm_dialog_y );
 
         return true;
 
@@ -1550,38 +1651,14 @@ void gradar_pi::RadarTxOff(void)
     pck.parm1 = 1;            // 1 (one) for "off"
 
     SendCommand((unsigned char *)&pck, sizeof(pck));
-
     grLogMessage(_T("TX Off\n"));
 
-    switch(g_radar_state) {
-    case RADAR_TX_ACTIVATE:
-    case RADAR_IN_TIMED_SPINUP:
-    case RADAR_TX_ACTIVE:
-        g_radar_state = RADAR_STANDBY;
-        break;
-    case RADAR_OFF:
-    case RADAR_ACTIVATE:
-    case RADAR_IN_TIMED_WARMUP:
-    case RADAR_STANDBY:
-        g_radar_state = RADAR_ACTIVATE;
-        break;
-    }
 }
 
 void gradar_pi::RadarTxOn(void)
 {
     if(!g_bmaster)
         return;
-
-    switch(g_radar_state)
-    {
-    case RADAR_STANDBY:
-        g_radar_state = RADAR_TX_ACTIVATE;
-        break;
-
-    default:
-        break;
-    }
 
     rad_ctl_pkt pck;
     pck.packet_type = 0x2b2;
@@ -1632,11 +1709,23 @@ void gradar_pi::CacheSetToolbarToolBitmaps( int bm_id_normal, int bm_id_rollover
     case BM_ID_GREEN_SLAVE:
         pnormal = _img_radar_green_slave;
         break;
+    case BM_ID_GREEN_TT:
+        pnormal = _img_radar_green_tt;
+        break;
+    case BM_ID_GREEN_SLAVE_TT:
+        pnormal = _img_radar_green_slave_tt;
+        break;
     case BM_ID_AMBER:
         pnormal = _img_radar_amber;
         break;
     case BM_ID_AMBER_SLAVE:
         pnormal = _img_radar_amber_slave;
+        break;
+    case BM_ID_AMBER_TT:
+        pnormal = _img_radar_amber_tt;
+        break;
+    case BM_ID_AMBER_SLAVE_TT:
+        pnormal = _img_radar_amber_slave_tt;
         break;
     case BM_ID_BLANK:
         pnormal = _img_radar_blank;
@@ -1662,11 +1751,23 @@ void gradar_pi::CacheSetToolbarToolBitmaps( int bm_id_normal, int bm_id_rollover
     case BM_ID_GREEN_SLAVE:
         prollover = _img_radar_green_slave;
         break;
+    case BM_ID_GREEN_TT:
+        prollover = _img_radar_green_tt;
+        break;
+    case BM_ID_GREEN_SLAVE_TT:
+        prollover = _img_radar_green_slave_tt;
+        break;
     case BM_ID_AMBER:
         prollover = _img_radar_amber;
         break;
     case BM_ID_AMBER_SLAVE:
         prollover = _img_radar_amber_slave;
+        break;
+    case BM_ID_AMBER_TT:
+        prollover = _img_radar_amber_tt;
+        break;
+    case BM_ID_AMBER_SLAVE_TT:
+        prollover = _img_radar_amber_slave_tt;
         break;
     case BM_ID_BLANK:
         prollover = _img_radar_blank;
@@ -1688,7 +1789,6 @@ void gradar_pi::UpdateState(void)
 {
     g_pseudo_tick++;
 
-
     wxString scan_state;
     wxString plug_state;
 
@@ -1696,6 +1796,9 @@ void gradar_pi::UpdateState(void)
     {
     case 1:
         scan_state = _T("Warmup");
+        break;
+    case 2:
+        scan_state =_T("TT Standby");
         break;
     case 3:
         scan_state = _T("Standby");
@@ -1705,6 +1808,12 @@ void gradar_pi::UpdateState(void)
         break;
     case 5:
         scan_state = _T("Spinup");
+        break;
+    case 7:
+        scan_state = _T("TT TX Active");
+        break;
+    case 8:
+        scan_state = _T("TT Spinup");
         break;
     default:
         scan_state = _T("Unknown");
@@ -1726,13 +1835,19 @@ void gradar_pi::UpdateState(void)
         plug_state = _T("Standby");
         break;
     case 4:
-        plug_state = _T("Tx Activate");
-        break;
-    case 5:
         plug_state = _T("Spinup");
         break;
-    case 6:
+    case 5:
         plug_state = _T("TX Active");
+        break;
+    case 6:
+        plug_state = _T("TT Standby");
+        break;
+    case 7:
+        plug_state = _T("TT TX Active");
+        break;
+    case 8:
+        plug_state = _T("TT Spinup");
         break;
     default:
         plug_state = _T("Unknown");
@@ -1766,20 +1881,23 @@ void gradar_pi::UpdateState(void)
             msg.Printf(_T("Scan packets per tick: %d\n"), g_scan_packets_per_tick );
             grLogMessage( msg );
         }
-
     }
 
     g_prev_radar_state = g_radar_state;
     g_prev_scanner_state = g_scanner_state;
 
     //    Auto state switching is only needed in master mode
-    if(g_bmaster) {
+   // if(g_bmaster) {
+    {
 //        int current_state = g_radar_state;
 
         switch (g_scanner_state)
         {
         case 1:
             g_radar_state = RADAR_IN_TIMED_WARMUP;
+            break;
+        case 2:
+            g_radar_state = RADAR_TT_STANDBY;
             break;
         case 3:
             g_radar_state = RADAR_STANDBY;
@@ -1790,13 +1908,16 @@ void gradar_pi::UpdateState(void)
         case 5:
             g_radar_state = RADAR_IN_TIMED_SPINUP;
             break;
+        case 7:
+            g_radar_state = RADAR_TT_TX_ACTIVE;
+            break;
+        case 8:
+            g_radar_state = RADAR_TT_SPINUP;
+            break;
 
         default:
             break;
         }
-
-//        if(current_state != g_radar_state)
-//            printf("  >>>Switch to state: %d\n", g_radar_state);
     }
 
 
@@ -1854,7 +1975,6 @@ void gradar_pi::UpdateState(void)
             CacheSetToolbarToolBitmaps( BM_ID_AMBER_SLAVE, BM_ID_AMBER_SLAVE);
         break;
 
-    case RADAR_TX_ACTIVATE:
     case RADAR_IN_TIMED_SPINUP:
         {
             if(g_pseudo_tick & 1) {
@@ -1879,6 +1999,21 @@ void gradar_pi::UpdateState(void)
             CacheSetToolbarToolBitmaps( BM_ID_GREEN_SLAVE, BM_ID_GREEN_SLAVE);
         break;
 
+    case RADAR_TT_STANDBY:
+    case RADAR_TT_SPINUP:
+        if(g_bmaster)
+            CacheSetToolbarToolBitmaps(BM_ID_AMBER_TT, BM_ID_AMBER_TT);
+        else
+            CacheSetToolbarToolBitmaps(BM_ID_AMBER_SLAVE_TT, BM_ID_AMBER_SLAVE_TT);
+        break;
+
+    case RADAR_TT_TX_ACTIVE:
+        if(g_bmaster)
+            CacheSetToolbarToolBitmaps(BM_ID_GREEN_TT, BM_ID_GREEN_TT);
+        else
+            CacheSetToolbarToolBitmaps(BM_ID_GREEN_SLAVE_TT, BM_ID_GREEN_SLAVE_TT);
+        break;
+
     default:
         break;
     }
@@ -1895,129 +2030,12 @@ void gradar_pi::Select_Range(double range_nm)
     pck.len1 = 4;
     pck.parm1 = range_parm_meters;
 
-    wxIPV4address destaddr;
-    destaddr.Service(_T("50101"));
-    destaddr.Hostname(_T("172.16.2.0"));
-    m_out_sock101->SendTo(destaddr, &pck, sizeof(pck));
-
-//    printf("SelectRange(): %g\n", range_nm);
+    SendCommand((unsigned char *)&pck, sizeof(pck));
 
     wxString msg;
     msg.Printf(_T("SelectRange: %g nm\n"), range_nm);
     grLogMessage(msg);
-
-
-    //      wxString msg;
-    //      msg.Printf(_T("Sent Radar Range Packet %0X"), parma);
-    //      wxLogMessage(msg);
-
 }
-
-
-void gradar_pi::draw_blob_gl(double angle, double radius, double blob_start, double blob_end, double arc_length, double ca, double sa)
-{
-    //    double ca = cos(angle * PI / 180.);
-    //    double sa = sin(angle * PI / 180.);
-
-
-    //    Calculate the blob size...
-    double xm1 = (radius + blob_start) * ca;
-    double ym1 = (radius + blob_start) * sa;
-    double xm2 = (radius + blob_end) * ca;
-    double ym2 = (radius + blob_end) * sa;
-
-    double blob_width_start2 =  ((radius + blob_start) * PI * arc_length / 360);
-    double blob_width_end2 =  ((radius + blob_end) * PI * arc_length / 360);
-
-    double xa = xm1 + blob_width_start2 * sa;
-    double ya = ym1 - blob_width_start2 * ca;
-
-    double xb = xm2 + blob_width_end2 * sa;
-    double yb = ym2 - blob_width_end2 * ca;
-
-    double xc = xm1 - blob_width_start2 * sa;
-    double yc = ym1 + blob_width_start2 * ca;
-
-    double xd = xm2 - blob_width_end2 * sa;
-    double yd = ym2 + blob_width_end2 * ca;
-
-
-    glBegin(GL_TRIANGLES);
-    glVertex2d(xa, ya);
-    glVertex2d(xb, yb);
-    glVertex2d(xc, yc);
-
-    glVertex2f(xb, yb);
-    glVertex2f(xc, yc);
-    glVertex2f(xd, yd);
-    glEnd();
-}
-
-void gradar_pi::RenderRadarBufferDirect(PlugIn_ViewPort *vp)
-{
-    return RenderRadarBuffer(g_scan_buf, g_current_scan_length_bytes, NULL, 0, 0);
-}
-
-
-
-void gradar_pi::RenderRadarBuffer(unsigned char *buffer, int buffer_line_length, wxDC *pdc, int width, int height)
-{
-    if(buffer == 0) return;
-    int maxrad = buffer_line_length/4;
-
-    for(int i=0 ; i < 360 ; i += 2)
-    {
-        unsigned char *packet_data = &buffer[i * buffer_line_length];
-        double angle = i;
-
-        for(int k=0 ; k < 4 ; ++k)
-        {
-            double ca = cos(angle * PI / 180.);
-            double sa = sin(angle * PI / 180.);
-
-            for(int j=0 ; j < maxrad ; ++j)
-            {
-                unsigned char data1 = *packet_data;
-                double rad = j;
-
-                if(data1 != 0){
-                    double b_start = 0.0;
-                    double b_end = 1.0;
-                    unsigned char alpha = 255 * g_overlay_transparency;
-                    if(data1 != 255){
-                        unsigned char data0 = *(packet_data - 1);
-                        unsigned char data2 = *(packet_data + 1);
-
-                        if((data0 == 255 && data2 != 255)||(data0 != 0 && data2 == 0))
-                            b_end = (double)data1/255.0;
-                        else if((data0  != 255 && data2 == 255)||(data0 == 0 && data2 != 0))
-                            b_start = (double)data1/255.0;
-                        else
-                            alpha = data1 * g_overlay_transparency;
-                    }
-
-                    if(!pdc) {
-
-                        glColor4ub(255, 0, 0, alpha);
-                        draw_blob_gl(angle, rad, b_start, b_end, 0.5, ca, sa);
-
-                    } else {
-
-                        wxColour c1(data1, 0, 0);
-                        wxPen p1(c1);
-                        wxBrush b1(c1);
-                        pdc->SetPen(p1);
-                        pdc->SetBrush(b1);
-                        draw_blob_dc(*pdc, angle, rad, 1.0, 0.5, 4., width/2, height/2, ca, sa);
-                    }
-                }
-                packet_data++;
-            }
-            angle += 0.5;
-        }
-    }
-}
-
 
 void gradar_pi::SetUpdateMode(int mode)
 {
@@ -2032,6 +2050,13 @@ void gradar_pi::SetOperatingMode(int mode)
         ShowNoAccessMessage();
         g_bmaster = false;
     }
+    if(!g_bmaster)
+        g_slave_display_mode = SLAVE_DISPLAY_ON;
+}
+
+void gradar_pi::SetScanColor( wxColour col )
+{
+    scol = col;
 }
 
 void gradar_pi::SetRangeControlMode(int mode)
@@ -2079,15 +2104,11 @@ void gradar_pi::SetGainControlMode(int mode)
     else
         pck.parm1 = g_gain_level;
 
-    wxIPV4address destaddr;
-    destaddr.Service(_T("50101"));
-    destaddr.Hostname(_T("172.16.2.0"));
-    m_out_sock101->SendTo(destaddr, &pck, sizeof(pck));
+    SendCommand((unsigned char *)&pck, sizeof(pck));
 
     wxString msg;
     msg.Printf(_T("g_gain_control_mode: %d \n"), g_gain_control_mode);
     grLogMessage(msg);
-
 }
 
 
@@ -2105,10 +2126,7 @@ void gradar_pi::SetGainLevel(int mode)
     pck.len1 = 4;
     pck.parm1 = g_gain_level;
 
-    wxIPV4address destaddr;
-    destaddr.Service(_T("50101"));
-    destaddr.Hostname(_T("172.16.2.0"));
-    m_out_sock101->SendTo(destaddr, &pck, sizeof(pck));
+    SendCommand((unsigned char *)&pck, sizeof(pck));
 
     wxString msg;
     msg.Printf(_T("g_gain_level: %d \n"), g_gain_level);
@@ -2162,10 +2180,7 @@ void gradar_pi::SetSeaClutterMode(int mode)
         break;
     }
 
-    wxIPV4address destaddr;
-    destaddr.Service(_T("50101"));
-    destaddr.Hostname(_T("172.16.2.0"));
-    m_out_sock101->SendTo(destaddr, &pck, sizeof(pck));
+    SendCommand((unsigned char *)&pck, sizeof(pck));
 
     wxString msg;
     msg.Printf(_T("g_sea_clutter_mode: %d \n"), g_sea_clutter_mode);
@@ -2191,10 +2206,7 @@ void gradar_pi::SetSeaClutterLevel(int mode)
     pck.parm1 = g_sea_clutter_level;
     pck.parm2 = 0;
 
-    wxIPV4address destaddr;
-    destaddr.Service(_T("50101"));
-    destaddr.Hostname(_T("172.16.2.0"));
-    m_out_sock101->SendTo(destaddr, &pck, sizeof(pck));
+    SendCommand((unsigned char *)&pck, sizeof(pck));
 
     wxString msg;
     msg.Printf(_T("g_sea_clutter_level: %d \n"), g_sea_clutter_level);
@@ -2216,10 +2228,7 @@ void gradar_pi::SetFTCMode(int mode)
     pck.len1 = 1;
     pck.parm1 = (unsigned char)g_FTC_mode;
 
-    wxIPV4address destaddr;
-    destaddr.Service(_T("50101"));
-    destaddr.Hostname(_T("172.16.2.0"));
-    m_out_sock101->SendTo(destaddr, &pck, sizeof(pck));
+    SendCommand((unsigned char *)&pck, sizeof(pck));
 
     wxString msg;
     msg.Printf(_T("g_FTC_mode: %d \n"), g_FTC_mode);
@@ -2240,10 +2249,7 @@ void gradar_pi::SetRainClutterLevel(int mode)
     pck.len1 = 4;
     pck.parm1 = g_rain_clutter_level;
 
-    wxIPV4address destaddr;
-    destaddr.Service(_T("50101"));
-    destaddr.Hostname(_T("172.16.2.0"));
-    m_out_sock101->SendTo(destaddr, &pck, sizeof(pck));
+    SendCommand((unsigned char *)&pck, sizeof(pck));
 
     wxString msg;
     msg.Printf(_T("g_rain_clutter_level: %d \n"), g_rain_clutter_level);
@@ -2268,10 +2274,7 @@ void gradar_pi::SetCrosstalkMode(int mode)
     else
         pck.parm1 = 0x01;          //on
 
-    wxIPV4address destaddr;
-    destaddr.Service(_T("50101"));
-    destaddr.Hostname(_T("172.16.2.0"));
-    m_out_sock101->SendTo(destaddr, &pck, sizeof(pck));
+    SendCommand((unsigned char *)&pck, sizeof(pck));
 
     wxString msg;
     msg.Printf(_T("g_crosstalk_mode: %d \n"), g_crosstalk_mode);
@@ -2292,10 +2295,7 @@ void gradar_pi::SetDomeOffset(int mode)
     pck.len1 = 2;
     pck.parm1 = g_dome_offset;
 
-    wxIPV4address destaddr;
-    destaddr.Service(_T("50101"));
-    destaddr.Hostname(_T("172.16.2.0"));
-    m_out_sock101->SendTo(destaddr, &pck, sizeof(pck));
+    SendCommand((unsigned char *)&pck, sizeof(pck));
 
     wxString msg;
     msg.Printf(_T("g_dome_offset: %d \n"), g_dome_offset);
@@ -2320,16 +2320,126 @@ void gradar_pi::SetDomeSpeed(int mode)
     else
         pck.parm1 = 0x01;          //30 rpm
 
-    wxIPV4address destaddr;
-    destaddr.Service(_T("50101"));
-    destaddr.Hostname(_T("172.16.2.0"));
-    m_out_sock101->SendTo(destaddr, &pck, sizeof(pck));
+    SendCommand((unsigned char *)&pck, sizeof(pck));
 
     wxString msg;
     msg.Printf(_T("g_dome_speed: %d \n"), g_dome_speed);
     grLogMessage(msg);
 }
 
+void gradar_pi::SetTimedTransmitMode(int mode)
+{   if(!g_bmaster){
+        if(m_pSentryDialog)
+            if(m_pSentryDialog->IsShown())m_pSentryDialog->SentryDialogShow();
+        return;
+    }
+
+    g_timedtransmit_mode = mode;
+
+    fourbyte_ctl_pkt pck;
+    pck.packet_type = 0x2bb;
+    pck.len1 = 4;
+    pck.parm4 = 0;
+
+    pck.parm1 = (unsigned char)g_timedtransmit_mode;
+    pck.parm2 = (unsigned char)g_transmit_minutes;
+    pck.parm3 = (unsigned char)g_standby_minutes;
+
+    SendCommand((unsigned char *)&pck, sizeof(pck));
+
+    wxString msg;
+    msg.Printf(_T("g_timedtransmit_mode: %d \n"), g_timedtransmit_mode);
+    grLogMessage(msg);
+
+}
+
+void gradar_pi::SetStandbyMinutes(int mode)
+{
+    if(!g_bmaster || !(g_timedtransmit_mode == 0)){
+        if(m_pSentryDialog)
+            if(m_pSentryDialog->IsShown())m_pSentryDialog->SentryDialogShow();
+        return;
+    }
+
+    g_standby_minutes = mode;
+
+    fourbyte_ctl_pkt pck;
+    pck.packet_type = 0x2bb;
+    pck.len1 = 4;
+    pck.parm4 = 0;
+
+    pck.parm1 = (unsigned char)g_timedtransmit_mode;
+    pck.parm2 = (unsigned char)g_transmit_minutes;
+    pck.parm3 = (unsigned char)g_standby_minutes;
+
+    SendCommand((unsigned char *)&pck, sizeof(pck));
+
+    wxString msg;
+    msg.Printf(_T("g_standby_minutes: %d \n"), g_standby_minutes);
+    grLogMessage(msg);
+}
+
+void gradar_pi::SetTransmitMinutes(int mode)
+{
+    if(!g_bmaster || !(g_timedtransmit_mode == 0)){
+        if(m_pSentryDialog)
+            if(m_pSentryDialog->IsShown())m_pSentryDialog->SentryDialogShow();
+        return;
+    }
+
+    g_transmit_minutes = mode;
+
+    fourbyte_ctl_pkt pck;
+    pck.packet_type = 0x2bb;
+    pck.len1 = 4;
+    pck.parm4 = 0;
+
+    pck.parm1 = (unsigned char)g_timedtransmit_mode;
+    pck.parm2 = (unsigned char)g_transmit_minutes;
+    pck.parm3 = (unsigned char)g_standby_minutes;
+
+    SendCommand((unsigned char *)&pck, sizeof(pck));
+
+    wxString msg;
+    msg.Printf(_T("g_transmit_minutes: %d \n"), g_transmit_minutes);
+    grLogMessage(msg);
+
+}
+
+void gradar_pi::SetGuardZoneMode(int mode)
+{
+    g_guardzone_mode = mode;
+}
+
+void gradar_pi::SetOuterRange(int mode)
+{
+    g_outer_range = mode;
+}
+
+void gradar_pi::SetInnerRange(int mode)
+{
+    g_inner_range = mode;
+}
+
+void gradar_pi::SetPartialArcMode(int mode)
+{
+    g_partial_arc_mode = mode;
+}
+
+void gradar_pi::SetStartAngle(int mode)
+{
+    g_arc_start_angle = mode;
+}
+
+void gradar_pi::SetEndAngle(int mode)
+{
+    g_arc_end_angle = mode;
+}
+
+void gradar_pi::SetGuardZoneColor( wxColour col )
+{
+    g_guardzone_color = col;
+}
 
 
 void gradar_pi::UpdateDisplayParameters(void)
@@ -2372,7 +2482,6 @@ void gradar_pi::ShowNoAccessMessage(void)
     wxMessageDialog dlg(GetOCPNCanvasWindow(),  message, _T("gradar_pi message"), wxOK);
     dlg.ShowModal();
 }
-
 
 
 MulticastRXThread::MulticastRXThread( wxMutex *pMutex, const wxString &IP_addr, const wxString &service_port)
@@ -2480,14 +2589,12 @@ void* MulticastRXThread::Entry()
         //       printf(" bytes read %d\n", m_sock->LastCount());
 
         if(m_sock->LastCount()) {
-            wxLogMessage(_T("->gradar_pi: First Packet Rx"));
+            grLogMessage(_T("->gradar_pi: First Packet Rx"));
             n_rx_once++;
 
             process_buffer();
         }
     }
-
-
 
     //    The big while....
      m_sock->SetTimeout(5);
@@ -2527,9 +2634,7 @@ void MulticastRXThread::process_buffer(void)
         {
             g_scan_packets_per_tick++;
 
-            g_scanner_state = 4;  //scanner must be alive
-
-            if(g_radar_state == RADAR_TX_ACTIVE) {
+            if((g_radar_state == RADAR_TX_ACTIVE)||(g_radar_state == RADAR_TT_TX_ACTIVE)) {
                 radar_scanline_pkt packet;
                 memcpy(&packet, buf, sizeof(radar_scanline_pkt));
 
@@ -2556,8 +2661,6 @@ void MulticastRXThread::process_buffer(void)
 
                 g_range_meters = packet.range_meters + 1;
                 g_scan_meters = packet.display_meters + 1;
-
-
                 g_scan_range = packet.range_meters + 1;
                 g_scan_gain_level = packet.gain_level[0];
                 g_scan_gain_mode = packet.gain_level[1];
@@ -2567,10 +2670,13 @@ void MulticastRXThread::process_buffer(void)
                 g_scan_dome_offset = packet.dome_offset;
                 g_scan_FTC_mode = packet.FTC_mode;
                 g_scan_crosstalk_mode = packet.crosstalk_onoff;
+                g_scan_timed_transmit_mode = packet.timed_transmit[0];
+                g_scan_timed_transmit_transmit = packet.timed_transmit[1];
+                g_scan_timed_transmit_standby = packet.timed_transmit[2];
                 g_scan_dome_speed = packet.dome_speed;
 
-                if(packet.angle == 358) g_sweep_count++;
-
+                if(packet.angle == 358)
+                    g_sweep_count++;
 
                 g_current_scan_length_bytes = packet.scan_length_bytes;
 
@@ -2587,8 +2693,6 @@ void MulticastRXThread::process_buffer(void)
                     }
 
                     memcpy(g_static_buf, g_scan_buf, packet.scan_length_bytes * 360);
-//                    printf("Static copy\n");
-                    g_static_timestamp = wxDateTime::Now();
                     g_static_scan_length_bytes = g_current_scan_length_bytes;
                     g_static_scan_meters = g_scan_meters;
                 }
@@ -2598,16 +2702,20 @@ void MulticastRXThread::process_buffer(void)
 
     case 0x2a5:
         {
+            g_scan_packets_per_tick++;
+
             rad_status_pkt packet;
             memcpy(&packet, buf, sizeof(rad_status_pkt));
             g_scanner_state = packet.parm1;
             g_warmup_timer = packet.parm2;
-//            printf("  0x2a5:  state: %d\n", packet.parm1);
+
             break;
         }
 
     case 0x2a7:
         {
+            g_scan_packets_per_tick++;
+
             radar_response_pkt packet;
             memcpy(&packet, buf, sizeof(radar_response_pkt));
             g_scan_range = packet.range_meters+1;
@@ -2619,6 +2727,9 @@ void MulticastRXThread::process_buffer(void)
             g_scan_dome_offset = packet.dome_offset;
             g_scan_FTC_mode = packet.FTC_mode;
             g_scan_crosstalk_mode = packet.crosstalk_onoff;
+            g_scan_timed_transmit_mode = packet.timed_transmit[0];
+            g_scan_timed_transmit_transmit = packet.timed_transmit[1];
+            g_scan_timed_transmit_standby = packet.timed_transmit[2];
             g_scan_dome_speed = packet.dome_speed;
             break;
         }
