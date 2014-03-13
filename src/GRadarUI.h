@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Oct  8 2012)
+// C++ code generated with wxFormBuilder (version Nov  6 2013)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -10,6 +10,7 @@
 
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
+#include <wx/intl.h>
 #include <wx/string.h>
 #include <wx/radiobox.h>
 #include <wx/gdicmn.h>
@@ -65,7 +66,7 @@ class ControlDialogBase : public wxDialog
 	
 	public:
 		
-		ControlDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Radar Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 163,535 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		ControlDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Radar Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 163,535 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~ControlDialogBase();
 	
 };
@@ -96,7 +97,7 @@ class RangeDialogBase : public wxDialog
 	
 	public:
 		
-		RangeDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Range"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 146,449 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		RangeDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Range"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 146,449 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~RangeDialogBase();
 	
 };
@@ -129,7 +130,7 @@ class NoiseDialogBase : public wxDialog
 	
 	public:
 		
-		NoiseDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Noise Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 216,395 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		NoiseDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Noise Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 216,395 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~NoiseDialogBase();
 	
 };
@@ -156,7 +157,7 @@ class DomeDialogBase : public wxDialog
 	
 	public:
 		
-		DomeDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Dome Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 158,218 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		DomeDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Dome Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 158,218 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~DomeDialogBase();
 	
 };
@@ -203,7 +204,7 @@ class SentryDialogBase : public wxDialog
 	
 	public:
 		
-		SentryDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Sentry Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 241,534 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		SentryDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Sentry Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 241,534 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~SentryDialogBase();
 	
 };
@@ -227,7 +228,7 @@ class SentryAlarmDialogBase : public wxDialog
 	
 	public:
 		
-		SentryAlarmDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("RadarSentryAlarm"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 281,142 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		SentryAlarmDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("RadarSentryAlarm"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 281,142 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~SentryAlarmDialogBase();
 	
 };
