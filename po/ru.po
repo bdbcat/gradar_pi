@@ -1,56 +1,48 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: gradar_pi \n"
+"Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-06 11:12-0600\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2014-01-25 16:23-0800\n"
+"PO-Revision-Date: 2014-11-08 14:29-0500\n"
+"Last-Translator: nohal <pavel@kalian.cz>\n"
+"Language-Team: Russian\n"
+"Language: ru_RU\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: crowdin.com\n"
 
-#: src/gradar_pi.cpp:710
+#: src/gradar_pi.cpp:734
 msgid "Radar Control Garmin"
 msgstr ""
 
-#: src/gradar_pi.cpp:834
+#: src/gradar_pi.cpp:859
 msgid "Garmin Radar PlugIn for OpenCPN"
 msgstr ""
 
-#: src/gradar_pi.cpp:839
+#: src/gradar_pi.cpp:864
 msgid "Garmin Radar PlugIn for OpenCPN\n"
 msgstr ""
 
-#: src/gradar_pi.cpp:1057
+#: src/gradar_pi.cpp:1088
 msgid "No scanner activity, reverting to search\n"
 msgstr ""
 
-#: src/gradar_pi.cpp:2540
-msgid ""
-"The Radar Overlay PlugIn requires OpenGL mode to be activated in Toolbox-"
-">Settings"
+#: src/gradar_pi.cpp:2454
+msgid "The Radar Overlay PlugIn requires OpenGL mode to be activated in Toolbox->Settings"
 msgstr ""
 
-#: src/gradar_pi.cpp:2553
-msgid ""
-"The Radar Overlay PlugIn is unable to\n"
-"directly control the radar scanner.\n"
-"\n"
+#: src/gradar_pi.cpp:2467
+msgid "The Radar Overlay PlugIn is unable to\ndirectly control the radar scanner.\n\n"
 msgstr ""
 
-#: src/gradar_pi.cpp:2554
+#: src/gradar_pi.cpp:2468
 msgid "Scanner is located at ip address: "
 msgstr ""
 
-#: src/gradar_pi.cpp:2557
+#: src/gradar_pi.cpp:2471
 msgid "Interfaces available on this computer are:\n"
 msgstr ""
 
@@ -309,7 +301,7 @@ msgid "Guard Zone Color"
 msgstr ""
 
 #: src/GRadarUI.cpp:496
-msgid "Guard Zone Transparency"
+msgid "Guard ZoneTransparency"
 msgstr ""
 
 #: src/GRadarUI.cpp:505
@@ -331,3 +323,4 @@ msgstr ""
 #: src/GRadarUI.h:231
 msgid "RadarSentryAlarm"
 msgstr ""
+

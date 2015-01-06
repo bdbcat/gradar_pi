@@ -1,333 +1,327 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: gradar_pi \n"
+"Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-06 11:12-0600\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2014-01-25 16:23-0800\n"
+"PO-Revision-Date: 2015-01-06 10:37-0500\n"
+"Last-Translator: nohal <pavel@kalian.cz>\n"
+"Language-Team: Swedish\n"
+"Language: sv_SE\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: crowdin.com\n"
+"X-Crowdin-Project: opencpn\n"
+"X-Crowdin-File: /plugins/gradar_pi/po/gradar_pi.pot\n"
 
-#: src/gradar_pi.cpp:710
+#: src/gradar_pi.cpp:734
 msgid "Radar Control Garmin"
-msgstr ""
+msgstr "Garmin radarInställningar"
 
-#: src/gradar_pi.cpp:834
+#: src/gradar_pi.cpp:859
 msgid "Garmin Radar PlugIn for OpenCPN"
-msgstr ""
+msgstr "Garmin Radarmodul för OpenCPN"
 
-#: src/gradar_pi.cpp:839
+#: src/gradar_pi.cpp:864
 msgid "Garmin Radar PlugIn for OpenCPN\n"
-msgstr ""
+msgstr "Garmin Radarmodul för OpenCPN\n"
 
-#: src/gradar_pi.cpp:1057
+#: src/gradar_pi.cpp:1088
 msgid "No scanner activity, reverting to search\n"
-msgstr ""
+msgstr "Ingen scanneraktivitet, fortsätter söka\n"
 
-#: src/gradar_pi.cpp:2540
-msgid ""
-"The Radar Overlay PlugIn requires OpenGL mode to be activated in Toolbox-"
-">Settings"
-msgstr ""
+#: src/gradar_pi.cpp:2454
+msgid "The Radar Overlay PlugIn requires OpenGL mode to be activated in Toolbox->Settings"
+msgstr "Överlagrad radarmodul kräver att OpenGL-läge är aktiverat i verktyg-> inställningar"
 
-#: src/gradar_pi.cpp:2553
-msgid ""
-"The Radar Overlay PlugIn is unable to\n"
-"directly control the radar scanner.\n"
-"\n"
-msgstr ""
+#: src/gradar_pi.cpp:2467
+msgid "The Radar Overlay PlugIn is unable to\ndirectly control the radar scanner.\n\n"
+msgstr "Radarmodulen kan inte ändra\ninställningarna för scannern.\n\n"
 
-#: src/gradar_pi.cpp:2554
+#: src/gradar_pi.cpp:2468
 msgid "Scanner is located at ip address: "
-msgstr ""
+msgstr "Skannern använder IP-adress: "
 
-#: src/gradar_pi.cpp:2557
+#: src/gradar_pi.cpp:2471
 msgid "Interfaces available on this computer are:\n"
-msgstr ""
+msgstr "På denna dator finns följande gränssnitt:\n"
 
 #: src/GRadarUI.cpp:23
 msgid "Operational Control"
-msgstr ""
+msgstr "Driftinställningar"
 
 #: src/GRadarUI.cpp:25
 msgid "Master Mode"
-msgstr ""
+msgstr "Master-läge"
 
 #: src/GRadarUI.cpp:25
 msgid "Slave Mode"
-msgstr ""
+msgstr "Slav-läge"
 
 #: src/GRadarUI.cpp:27
 msgid "Operating Mode"
-msgstr ""
+msgstr "Driftsläge"
 
 #: src/GRadarUI.cpp:35
 msgid "Display Options"
-msgstr ""
+msgstr "Visningsalternativ"
 
 #: src/GRadarUI.cpp:37
 msgid "Swept Scan Update"
-msgstr ""
+msgstr "svepuppdatering"
 
 #: src/GRadarUI.cpp:37
 msgid "Full Scan Update"
-msgstr ""
+msgstr "Fullständig uppdatering"
 
 #: src/GRadarUI.cpp:39
 msgid "Scan Update Method"
-msgstr ""
+msgstr "Uppdateringsmetod"
 
 #: src/GRadarUI.cpp:44
 msgid "Scan Color"
-msgstr ""
+msgstr "Kulör"
 
 #: src/GRadarUI.cpp:53
 msgid "Scan Transparency"
-msgstr ""
+msgstr "Transparens"
 
 #: src/GRadarUI.cpp:64
 msgid "Enable gradar Log"
-msgstr ""
+msgstr "Aktivera \"G-radar\" Log"
 
 #: src/GRadarUI.cpp:67
 msgid "Range Control"
-msgstr ""
+msgstr "Avståndsinställning"
 
 #: src/GRadarUI.cpp:70 src/GRadarUI.h:133
 msgid "Noise Control"
-msgstr ""
+msgstr "Störningsinställning"
 
 #: src/GRadarUI.cpp:73 src/GRadarUI.h:160
 msgid "Dome Control"
-msgstr ""
+msgstr "Scannerinställningar"
 
 #: src/GRadarUI.cpp:76 src/GRadarUI.h:207
 msgid "Sentry Control"
-msgstr ""
+msgstr "Larminställningar"
 
 #: src/GRadarUI.cpp:79 src/GRadarUI.cpp:170 src/GRadarUI.cpp:269
 #: src/GRadarUI.cpp:343 src/GRadarUI.cpp:519 src/GRadarUI.cpp:595
 msgid "Close"
-msgstr ""
+msgstr "Avsluta"
 
 #: src/GRadarUI.cpp:135
 msgid "Range Setting"
-msgstr ""
+msgstr "Avståndsinställningar"
 
 #: src/GRadarUI.cpp:137 src/GRadarUI.cpp:155
 msgid "Auto"
-msgstr ""
+msgstr "Auto"
 
 #: src/GRadarUI.cpp:137 src/GRadarUI.cpp:155
 msgid "Manual"
-msgstr ""
+msgstr "Manuell"
 
 #: src/GRadarUI.cpp:143
 msgid ".125"
-msgstr ""
+msgstr ",125"
 
 #: src/GRadarUI.cpp:143
 msgid ".25"
-msgstr ""
+msgstr ",25"
 
 #: src/GRadarUI.cpp:143
 msgid ".50"
-msgstr ""
+msgstr ",50"
 
 #: src/GRadarUI.cpp:143
 msgid ".75"
-msgstr ""
+msgstr ",75"
 
 #: src/GRadarUI.cpp:143
 msgid "1.0"
-msgstr ""
+msgstr "1,0"
 
 #: src/GRadarUI.cpp:143
 msgid "1.5"
-msgstr ""
+msgstr "1,5"
 
 #: src/GRadarUI.cpp:143
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: src/GRadarUI.cpp:143
 msgid "3"
-msgstr ""
+msgstr "3"
 
 #: src/GRadarUI.cpp:143
 msgid "4"
-msgstr ""
+msgstr "4"
 
 #: src/GRadarUI.cpp:143
 msgid "6"
-msgstr ""
+msgstr "6"
 
 #: src/GRadarUI.cpp:143
 msgid "8"
-msgstr ""
+msgstr "8"
 
 #: src/GRadarUI.cpp:143
 msgid "12"
-msgstr ""
+msgstr "12"
 
 #: src/GRadarUI.cpp:143
 msgid "16"
-msgstr ""
+msgstr "16"
 
 #: src/GRadarUI.cpp:143 src/GRadarUI.cpp:331
 msgid "24"
-msgstr ""
+msgstr "24"
 
 #: src/GRadarUI.cpp:143
 msgid "36"
-msgstr ""
+msgstr "36"
 
 #: src/GRadarUI.cpp:143
 msgid "48"
-msgstr ""
+msgstr "48"
 
 #: src/GRadarUI.cpp:145
 msgid "Range Miles"
-msgstr ""
+msgstr "Avstånd Nm"
 
 #: src/GRadarUI.cpp:153
 msgid "Gain"
-msgstr ""
+msgstr "Förstärkning"
 
 #: src/GRadarUI.cpp:219
 msgid "SeaClutter Sensitivity Time Control"
-msgstr ""
+msgstr "Tidsinställning sjöfilter"
 
 #: src/GRadarUI.cpp:221
 msgid "Man"
-msgstr ""
+msgstr "Man"
 
 #: src/GRadarUI.cpp:221
 msgid "Calm"
-msgstr ""
+msgstr "Lugnt"
 
 #: src/GRadarUI.cpp:221 src/GRadarUI.cpp:236
 msgid "Med"
-msgstr ""
+msgstr "Med"
 
 #: src/GRadarUI.cpp:221 src/GRadarUI.cpp:236
 msgid "High"
-msgstr ""
+msgstr "Hög"
 
 #: src/GRadarUI.cpp:234
 msgid "FTC Fast Time Constant"
-msgstr ""
+msgstr "FTC snabb tidskonstant"
 
 #: src/GRadarUI.cpp:236 src/GRadarUI.cpp:257 src/GRadarUI.cpp:390
 #: src/GRadarUI.cpp:426
 msgid "Off"
-msgstr ""
+msgstr "Av"
 
 #: src/GRadarUI.cpp:236
 msgid "Low"
-msgstr ""
+msgstr "Låg"
 
 #: src/GRadarUI.cpp:246
 msgid "RainClutter"
-msgstr ""
+msgstr "Regnfilter"
 
 #: src/GRadarUI.cpp:255
 msgid "Crosstalk"
-msgstr ""
+msgstr "Överhörning"
 
 #: src/GRadarUI.cpp:257 src/GRadarUI.cpp:390 src/GRadarUI.cpp:426
 msgid "On"
-msgstr ""
+msgstr "På"
 
 #: src/GRadarUI.cpp:320
 msgid "Dome Offset"
-msgstr ""
+msgstr "Sidoförskjutning"
 
 #: src/GRadarUI.cpp:329
 msgid "Dome Speed"
-msgstr ""
+msgstr "Skannerhastighet"
 
 #: src/GRadarUI.cpp:331
 msgid "30"
-msgstr ""
+msgstr "30"
 
 #: src/GRadarUI.cpp:388
 msgid "Timed Transmit"
-msgstr ""
+msgstr "Överföringssynkronisering"
 
 #: src/GRadarUI.cpp:400
 msgid "Standby Minutes"
-msgstr ""
+msgstr "Pausetid minuter"
 
 #: src/GRadarUI.cpp:409
 msgid "Transmit Minutes"
-msgstr ""
+msgstr "Aktiveringstid minuter"
 
 #: src/GRadarUI.cpp:424
 msgid "Guard Zone"
-msgstr ""
+msgstr "Säkerthetszon"
 
 #: src/GRadarUI.cpp:436
 msgid "Outer Range Meters"
-msgstr ""
+msgstr "Yttre avstånd i meter"
 
 #: src/GRadarUI.cpp:445
 msgid "Inner Range Meters"
-msgstr ""
+msgstr "Inre avstånd i meter"
 
 #: src/GRadarUI.cpp:456
 msgid "No"
-msgstr ""
+msgstr "Nej"
 
 #: src/GRadarUI.cpp:456
 msgid "Yes"
-msgstr ""
+msgstr "Ja"
 
 #: src/GRadarUI.cpp:458
 msgid "Partial Arc"
-msgstr ""
+msgstr "Partiell cirkelbåge"
 
 #: src/GRadarUI.cpp:466
 msgid "Start Angle"
-msgstr ""
+msgstr "Startvinkel"
 
 #: src/GRadarUI.cpp:475
 msgid "End Angle"
-msgstr ""
+msgstr "Slutvinkel"
 
 #: src/GRadarUI.cpp:487
 msgid "Guard Zone Color"
-msgstr ""
+msgstr "Säkerhetszonens kulör"
 
 #: src/GRadarUI.cpp:496
-msgid "Guard Zone Transparency"
-msgstr ""
+msgid "Guard ZoneTransparency"
+msgstr "Säkerhetszonens transparens"
 
 #: src/GRadarUI.cpp:505
 msgid "Alarm Sensitivity"
-msgstr ""
+msgstr "Larmkänslighet"
 
 #: src/GRadarUI.cpp:583
 msgid "Radar Sentry Alarm"
-msgstr ""
+msgstr "Radar zonlarm"
 
 #: src/GRadarUI.h:69
 msgid "Radar Control"
-msgstr ""
+msgstr "Radarinställningar"
 
 #: src/GRadarUI.h:100
 msgid "Range"
-msgstr ""
+msgstr "Avstånd"
 
 #: src/GRadarUI.h:231
 msgid "RadarSentryAlarm"
-msgstr ""
+msgstr "Zonlarm"
+
