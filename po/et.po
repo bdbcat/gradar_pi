@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-25 16:23-0800\n"
-"PO-Revision-Date: 2015-01-06 10:36-0500\n"
+"PO-Revision-Date: 2015-06-02 20:34-0400\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: Estonian\n"
 "Language: et_EE\n"
@@ -13,6 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: opencpn\n"
+"X-Crowdin-Language: et\n"
 "X-Crowdin-File: /plugins/gradar_pi/po/gradar_pi.pot\n"
 
 #: src/gradar_pi.cpp:734
@@ -33,15 +34,17 @@ msgstr "Skänner ei ole aktiivne, rakendamas otsingut \n"
 
 #: src/gradar_pi.cpp:2454
 msgid "The Radar Overlay PlugIn requires OpenGL mode to be activated in Toolbox->Settings"
-msgstr "Radari ülekatte plugin vajab, et OpenGL-töörežiim oleks aktiveeritud Kuvamine->Valikud"
+msgstr "Radari ülekatte plugin vajab aktiveeeritud OpenGL-töörežiimi jaotuses Kuvamine->Valikud"
 
 #: src/gradar_pi.cpp:2467
-msgid "The Radar Overlay PlugIn is unable to\ndirectly control the radar scanner.\n\n"
-msgstr "Radari ülekatte plugin ei ole võimeline\notse juhtima radari skännerit.\n\n"
+msgid "The Radar Overlay PlugIn is unable to\n"
+"directly control the radar scanner.\n\n"
+msgstr "Radari ülekatte plugin ei ole võimeline\n"
+"otse ohjama radari skännerit.\n\n"
 
 #: src/gradar_pi.cpp:2468
 msgid "Scanner is located at ip address: "
-msgstr "Skänner asub ip-aadressil: "
+msgstr "Skänner asub IP-aadressil: "
 
 #: src/gradar_pi.cpp:2471
 msgid "Interfaces available on this computer are:\n"
@@ -69,7 +72,7 @@ msgstr "Kuvamise valikud"
 
 #: src/GRadarUI.cpp:37
 msgid "Swept Scan Update"
-msgstr "Kiire-laotuse (sweep) uuendamine"
+msgstr "Kiire-laotuse uuendamine"
 
 #: src/GRadarUI.cpp:37
 msgid "Full Scan Update"
@@ -114,7 +117,7 @@ msgstr "Sulge"
 
 #: src/GRadarUI.cpp:135
 msgid "Range Setting"
-msgstr "Ulatuse valikud"
+msgstr "Ulatuse sätted"
 
 #: src/GRadarUI.cpp:137 src/GRadarUI.cpp:155
 msgid "Auto"

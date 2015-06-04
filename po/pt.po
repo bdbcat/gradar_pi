@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-25 16:23-0800\n"
-"PO-Revision-Date: 2015-01-06 10:37-0500\n"
+"PO-Revision-Date: 2015-05-23 05:02-0400\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -13,6 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: opencpn\n"
+"X-Crowdin-Language: pt-BR\n"
 "X-Crowdin-File: /plugins/gradar_pi/po/gradar_pi.pot\n"
 
 #: src/gradar_pi.cpp:734
@@ -36,8 +37,10 @@ msgid "The Radar Overlay PlugIn requires OpenGL mode to be activated in Toolbox-
 msgstr "O PlugIn de sobreposição de Radar requer o modo OpenGL ativado na caixa de ferramentas-> configurações"
 
 #: src/gradar_pi.cpp:2467
-msgid "The Radar Overlay PlugIn is unable to\ndirectly control the radar scanner.\n\n"
-msgstr "O PlugIn de sobreposição de Radar é incapaz de \ndiretamente controlar o escaner do radar.\n\n"
+msgid "The Radar Overlay PlugIn is unable to\n"
+"directly control the radar scanner.\n\n"
+msgstr "O PlugIn de sobreposição de Radar é incapaz de \n"
+"diretamente controlar o escaner do radar.\n\n"
 
 #: src/gradar_pi.cpp:2468
 msgid "Scanner is located at ip address: "
@@ -218,110 +221,110 @@ msgstr "alta"
 
 #: src/GRadarUI.cpp:234
 msgid "FTC Fast Time Constant"
-msgstr ""
+msgstr "Constante de tempo rápida FTC"
 
 #: src/GRadarUI.cpp:236 src/GRadarUI.cpp:257 src/GRadarUI.cpp:390
 #: src/GRadarUI.cpp:426
 msgid "Off"
-msgstr ""
+msgstr "Desligado"
 
 #: src/GRadarUI.cpp:236
 msgid "Low"
-msgstr ""
+msgstr "Baixo"
 
 #: src/GRadarUI.cpp:246
 msgid "RainClutter"
-msgstr ""
+msgstr "Eco de chuva"
 
 #: src/GRadarUI.cpp:255
 msgid "Crosstalk"
-msgstr ""
+msgstr "Interferência"
 
 #: src/GRadarUI.cpp:257 src/GRadarUI.cpp:390 src/GRadarUI.cpp:426
 msgid "On"
-msgstr ""
+msgstr "Ligado"
 
 #: src/GRadarUI.cpp:320
 msgid "Dome Offset"
-msgstr ""
+msgstr "Deslocamento antena"
 
 #: src/GRadarUI.cpp:329
 msgid "Dome Speed"
-msgstr ""
+msgstr "Velocidade antena"
 
 #: src/GRadarUI.cpp:331
 msgid "30"
-msgstr ""
+msgstr "30"
 
 #: src/GRadarUI.cpp:388
 msgid "Timed Transmit"
-msgstr ""
+msgstr "Transmissão agendada"
 
 #: src/GRadarUI.cpp:400
 msgid "Standby Minutes"
-msgstr ""
+msgstr "Minutos de espera"
 
 #: src/GRadarUI.cpp:409
 msgid "Transmit Minutes"
-msgstr ""
+msgstr "Minutos de transmissão"
 
 #: src/GRadarUI.cpp:424
 msgid "Guard Zone"
-msgstr ""
+msgstr "Zona de vigia"
 
 #: src/GRadarUI.cpp:436
 msgid "Outer Range Meters"
-msgstr ""
+msgstr "Alcance exterior em métros"
 
 #: src/GRadarUI.cpp:445
 msgid "Inner Range Meters"
-msgstr ""
+msgstr "Alcance interior em metros"
 
 #: src/GRadarUI.cpp:456
 msgid "No"
-msgstr ""
+msgstr "Não"
 
 #: src/GRadarUI.cpp:456
 msgid "Yes"
-msgstr ""
+msgstr "Sim"
 
 #: src/GRadarUI.cpp:458
 msgid "Partial Arc"
-msgstr ""
+msgstr "Arco parcial"
 
 #: src/GRadarUI.cpp:466
 msgid "Start Angle"
-msgstr ""
+msgstr "Ângulo inicio"
 
 #: src/GRadarUI.cpp:475
 msgid "End Angle"
-msgstr ""
+msgstr "Ângulo fim"
 
 #: src/GRadarUI.cpp:487
 msgid "Guard Zone Color"
-msgstr ""
+msgstr "Cor da zona de vigia"
 
 #: src/GRadarUI.cpp:496
 msgid "Guard ZoneTransparency"
-msgstr ""
+msgstr "Transparência da zona de vigia"
 
 #: src/GRadarUI.cpp:505
 msgid "Alarm Sensitivity"
-msgstr ""
+msgstr "Sensibilidade do alarme"
 
 #: src/GRadarUI.cpp:583
 msgid "Radar Sentry Alarm"
-msgstr ""
+msgstr "Alarme sentinela do radar"
 
 #: src/GRadarUI.h:69
 msgid "Radar Control"
-msgstr ""
+msgstr "Controlo do radar"
 
 #: src/GRadarUI.h:100
 msgid "Range"
-msgstr ""
+msgstr "Alcance"
 
 #: src/GRadarUI.h:231
 msgid "RadarSentryAlarm"
-msgstr ""
+msgstr "RadarSentryAlarm"
 

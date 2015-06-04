@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-25 16:23-0800\n"
-"PO-Revision-Date: 2015-01-06 10:37-0500\n"
+"PO-Revision-Date: 2015-06-04 16:23-0400\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
@@ -13,6 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: opencpn\n"
+"X-Crowdin-Language: vi\n"
 "X-Crowdin-File: /plugins/gradar_pi/po/gradar_pi.pot\n"
 
 #: src/gradar_pi.cpp:734
@@ -36,7 +37,8 @@ msgid "The Radar Overlay PlugIn requires OpenGL mode to be activated in Toolbox-
 msgstr ""
 
 #: src/gradar_pi.cpp:2467
-msgid "The Radar Overlay PlugIn is unable to\ndirectly control the radar scanner.\n\n"
+msgid "The Radar Overlay PlugIn is unable to\n"
+"directly control the radar scanner.\n\n"
 msgstr ""
 
 #: src/gradar_pi.cpp:2468

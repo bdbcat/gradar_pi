@@ -3,16 +3,18 @@ msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-25 16:23-0800\n"
-"PO-Revision-Date: 2014-11-25 14:06-0500\n"
+"PO-Revision-Date: 2015-05-23 05:01-0400\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: Catalan\n"
 "Language: ca_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: crowdin.com\n"
+"X-Crowdin-Project: opencpn\n"
+"X-Crowdin-Language: ca\n"
+"X-Crowdin-File: /plugins/gradar_pi/po/gradar_pi.pot\n"
 
 #: src/gradar_pi.cpp:734
 msgid "Radar Control Garmin"
@@ -35,8 +37,10 @@ msgid "The Radar Overlay PlugIn requires OpenGL mode to be activated in Toolbox-
 msgstr "El connector de \"sobreposició de radar\" requereix el mode OpenGL activat a la caixa d'eines->configuracions"
 
 #: src/gradar_pi.cpp:2467
-msgid "The Radar Overlay PlugIn is unable to\ndirectly control the radar scanner.\n\n"
-msgstr "El connector de \"sobreposició de radar\" és incapaç de\ncontrolar ditrectament l'escàner del radar.\n\n"
+msgid "The Radar Overlay PlugIn is unable to\n"
+"directly control the radar scanner.\n\n"
+msgstr "El connector de \"sobreposició de radar\" és incapaç de\n"
+"controlar ditrectament l'escàner del radar.\n\n"
 
 #: src/gradar_pi.cpp:2468
 msgid "Scanner is located at ip address: "
@@ -217,7 +221,7 @@ msgstr "Alt"
 
 #: src/GRadarUI.cpp:234
 msgid "FTC Fast Time Constant"
-msgstr ""
+msgstr "Constant de temps ràpida FTC"
 
 #: src/GRadarUI.cpp:236 src/GRadarUI.cpp:257 src/GRadarUI.cpp:390
 #: src/GRadarUI.cpp:426
@@ -242,11 +246,11 @@ msgstr "Activat"
 
 #: src/GRadarUI.cpp:320
 msgid "Dome Offset"
-msgstr ""
+msgstr "Retard d'Antena"
 
 #: src/GRadarUI.cpp:329
 msgid "Dome Speed"
-msgstr ""
+msgstr "Velocitat d'Antena"
 
 #: src/GRadarUI.cpp:331
 msgid "30"
@@ -270,11 +274,11 @@ msgstr "Zona de Vigilància"
 
 #: src/GRadarUI.cpp:436
 msgid "Outer Range Meters"
-msgstr ""
+msgstr "Radi Exterior en Metres"
 
 #: src/GRadarUI.cpp:445
 msgid "Inner Range Meters"
-msgstr ""
+msgstr "Radi Interior en Metres"
 
 #: src/GRadarUI.cpp:456
 msgid "No"
@@ -322,5 +326,5 @@ msgstr "Distància"
 
 #: src/GRadarUI.h:231
 msgid "RadarSentryAlarm"
-msgstr ""
+msgstr "AlarmaSentinellaRadar"
 

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-01-25 16:23-0800\n"
-"PO-Revision-Date: 2015-01-06 10:36-0500\n"
+"PO-Revision-Date: 2015-06-04 16:22-0400\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -13,6 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: crowdin.com\n"
 "X-Crowdin-Project: opencpn\n"
+"X-Crowdin-Language: fr\n"
 "X-Crowdin-File: /plugins/gradar_pi/po/gradar_pi.pot\n"
 
 #: src/gradar_pi.cpp:734
@@ -36,8 +37,10 @@ msgid "The Radar Overlay PlugIn requires OpenGL mode to be activated in Toolbox-
 msgstr "Le complément Superposition Radar nécessite que l'option OpenGL soit activée dans les options d'OpenCPN."
 
 #: src/gradar_pi.cpp:2467
-msgid "The Radar Overlay PlugIn is unable to\ndirectly control the radar scanner.\n\n"
-msgstr "Le complément \"Radar overlay\" est incapable de\ncontroler directement le scanner du radar.\n\n"
+msgid "The Radar Overlay PlugIn is unable to\n"
+"directly control the radar scanner.\n\n"
+msgstr "Le complément \"Radar overlay\" est incapable de\n"
+"controler directement le scanner du radar.\n\n"
 
 #: src/gradar_pi.cpp:2468
 msgid "Scanner is located at ip address: "
@@ -101,7 +104,7 @@ msgstr "Commande du bruit"
 
 #: src/GRadarUI.cpp:73 src/GRadarUI.h:160
 msgid "Dome Control"
-msgstr "Commande du radôme"
+msgstr "Contrôle de l'aérien"
 
 #: src/GRadarUI.cpp:76 src/GRadarUI.h:207
 msgid "Sentry Control"
@@ -202,7 +205,7 @@ msgstr "Commande de durée de la sensibilité au clapot"
 
 #: src/GRadarUI.cpp:221
 msgid "Man"
-msgstr "Man"
+msgstr "Manuel"
 
 #: src/GRadarUI.cpp:221
 msgid "Calm"
@@ -243,11 +246,11 @@ msgstr "Activé"
 
 #: src/GRadarUI.cpp:320
 msgid "Dome Offset"
-msgstr "Décalage du radôme"
+msgstr "Décalage de l'aérien"
 
 #: src/GRadarUI.cpp:329
 msgid "Dome Speed"
-msgstr "Vitesse du dome"
+msgstr "Vitesse de l'aérien"
 
 #: src/GRadarUI.cpp:331
 msgid "30"
@@ -263,7 +266,7 @@ msgstr "Minutes en veille"
 
 #: src/GRadarUI.cpp:409
 msgid "Transmit Minutes"
-msgstr "Transmettre les minutes"
+msgstr "Durée d'émission en minutes"
 
 #: src/GRadarUI.cpp:424
 msgid "Guard Zone"
@@ -323,5 +326,5 @@ msgstr "Rayon"
 
 #: src/GRadarUI.h:231
 msgid "RadarSentryAlarm"
-msgstr "RadarSentryAlarm"
+msgstr "Alarme de sentinelle"
 
