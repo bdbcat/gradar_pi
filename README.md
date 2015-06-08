@@ -1,6 +1,6 @@
 
-gxradar_pi - Garmin Radar Plugin for OpenCPN
-============================================
+gradar_pi - Garmin Radar Plugin for OpenCPN
+===========================================
 
 Downloads
 ---------
@@ -16,8 +16,8 @@ git clone https://github.com/bdbcat/gradar_pi.git
 
 ###Build:
 ```
-mkdir gxradar_pi/build
-cd gxradar_pi/build
+mkdir gradar_pi/build
+cd gradar_pi/build
 cmake ..
 cmake --build .
 ```
