@@ -2606,7 +2606,7 @@ void* MulticastRXThread::Entry()
      //    Subscribe to a multicast group
      unsigned int a = 0;
 #ifdef __WXGTK__
-     GAddress gaddress;
+/*     GAddress gaddress;
      _GAddress_Init_INET(&gaddress);
      GAddress_INET_SetHostName(&gaddress, m_ip.mb_str());
      //       struct in_addr *iaddr;
@@ -2616,6 +2616,9 @@ void* MulticastRXThread::Entry()
      struct in_addr *addr;
      addr = &(((struct sockaddr_in *)gaddress.m_addr)->sin_addr);
      a = addr->s_addr;
+ */
+     a = inet_addr(m_ip.mb_str());
+
 #endif
 
 #ifdef __WXMSW__
