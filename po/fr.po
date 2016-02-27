@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 16:23-0800\n"
-"PO-Revision-Date: 2015-06-04 16:22-0400\n"
+"POT-Creation-Date: 2015-01-06 11:12-0600\n"
+"PO-Revision-Date: 2016-02-27 12:12-0500\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -16,37 +16,37 @@ msgstr ""
 "X-Crowdin-Language: fr\n"
 "X-Crowdin-File: /plugins/gradar_pi/po/gradar_pi.pot\n"
 
-#: src/gradar_pi.cpp:734
+#: src/gradar_pi.cpp:710
 msgid "Radar Control Garmin"
 msgstr "Commande du radar Garmin"
 
-#: src/gradar_pi.cpp:859
+#: src/gradar_pi.cpp:834
 msgid "Garmin Radar PlugIn for OpenCPN"
 msgstr "Complément Radar Garmin pour OpenCPN"
 
-#: src/gradar_pi.cpp:864
+#: src/gradar_pi.cpp:839
 msgid "Garmin Radar PlugIn for OpenCPN\n"
 msgstr "Complément pour Radar Garmin pour OpenCPN\n"
 
-#: src/gradar_pi.cpp:1088
+#: src/gradar_pi.cpp:1057
 msgid "No scanner activity, reverting to search\n"
 msgstr "Aucune activité de scanner, retour sur recherche\n"
 
-#: src/gradar_pi.cpp:2454
+#: src/gradar_pi.cpp:2540
 msgid "The Radar Overlay PlugIn requires OpenGL mode to be activated in Toolbox->Settings"
 msgstr "Le complément Superposition Radar nécessite que l'option OpenGL soit activée dans les options d'OpenCPN."
 
-#: src/gradar_pi.cpp:2467
+#: src/gradar_pi.cpp:2553
 msgid "The Radar Overlay PlugIn is unable to\n"
 "directly control the radar scanner.\n\n"
 msgstr "Le complément \"Radar overlay\" est incapable de\n"
 "controler directement le scanner du radar.\n\n"
 
-#: src/gradar_pi.cpp:2468
+#: src/gradar_pi.cpp:2554
 msgid "Scanner is located at ip address: "
 msgstr "Le scanner est logé à l'adresse IP : "
 
-#: src/gradar_pi.cpp:2471
+#: src/gradar_pi.cpp:2557
 msgid "Interfaces available on this computer are:\n"
 msgstr "Les interfaces disponibles sur ce PC sont :\n"
 
@@ -305,7 +305,7 @@ msgid "Guard Zone Color"
 msgstr "Couleur de la zone de garde"
 
 #: src/GRadarUI.cpp:496
-msgid "Guard ZoneTransparency"
+msgid "Guard Zone Transparency"
 msgstr "Transparence de la zone de garde"
 
 #: src/GRadarUI.cpp:505

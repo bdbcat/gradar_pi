@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 16:23-0800\n"
-"PO-Revision-Date: 2015-06-02 20:34-0400\n"
+"POT-Creation-Date: 2015-01-06 11:12-0600\n"
+"PO-Revision-Date: 2016-02-27 12:12-0500\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -16,37 +16,37 @@ msgstr ""
 "X-Crowdin-Language: nl\n"
 "X-Crowdin-File: /plugins/gradar_pi/po/gradar_pi.pot\n"
 
-#: src/gradar_pi.cpp:734
+#: src/gradar_pi.cpp:710
 msgid "Radar Control Garmin"
 msgstr "Bediening Garmin radar"
 
-#: src/gradar_pi.cpp:859
+#: src/gradar_pi.cpp:834
 msgid "Garmin Radar PlugIn for OpenCPN"
 msgstr "Garmin Radar PlugIn voor OpenCPN"
 
-#: src/gradar_pi.cpp:864
+#: src/gradar_pi.cpp:839
 msgid "Garmin Radar PlugIn for OpenCPN\n"
 msgstr "Garmin Radar PlugIn voor OpenCPN\n"
 
-#: src/gradar_pi.cpp:1088
+#: src/gradar_pi.cpp:1057
 msgid "No scanner activity, reverting to search\n"
 msgstr "Geen scanneractiviteit, terug naar zoeken\n"
 
-#: src/gradar_pi.cpp:2454
+#: src/gradar_pi.cpp:2540
 msgid "The Radar Overlay PlugIn requires OpenGL mode to be activated in Toolbox->Settings"
 msgstr "De Radar Overlay PlugIn vereist activatie van OpenGL-modus via Optionele Instellingen - Toon op scherm"
 
-#: src/gradar_pi.cpp:2467
+#: src/gradar_pi.cpp:2553
 msgid "The Radar Overlay PlugIn is unable to\n"
 "directly control the radar scanner.\n\n"
 msgstr "De Radar Overlay PlugIn heeft geen\n"
 "directe controle over de radarscanner.\n\n"
 
-#: src/gradar_pi.cpp:2468
+#: src/gradar_pi.cpp:2554
 msgid "Scanner is located at ip address: "
 msgstr "Het IP-adres van de scanner is: "
 
-#: src/gradar_pi.cpp:2471
+#: src/gradar_pi.cpp:2557
 msgid "Interfaces available on this computer are:\n"
 msgstr "Interfaces die beschikbaar zijn op deze computer zijn: \n"
 
@@ -305,7 +305,7 @@ msgid "Guard Zone Color"
 msgstr "Kleur bewakingszone"
 
 #: src/GRadarUI.cpp:496
-msgid "Guard ZoneTransparency"
+msgid "Guard Zone Transparency"
 msgstr "Transparantie bewakingszone"
 
 #: src/GRadarUI.cpp:505

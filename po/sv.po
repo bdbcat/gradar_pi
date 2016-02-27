@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-01-25 16:23-0800\n"
-"PO-Revision-Date: 2015-05-29 14:06-0400\n"
+"POT-Creation-Date: 2015-01-06 11:12-0600\n"
+"PO-Revision-Date: 2016-02-18 16:09-0500\n"
 "Last-Translator: nohal <pavel@kalian.cz>\n"
 "Language-Team: Swedish\n"
 "Language: sv_SE\n"
@@ -16,37 +16,37 @@ msgstr ""
 "X-Crowdin-Language: sv-SE\n"
 "X-Crowdin-File: /plugins/gradar_pi/po/gradar_pi.pot\n"
 
-#: src/gradar_pi.cpp:734
+#: src/gradar_pi.cpp:710
 msgid "Radar Control Garmin"
 msgstr "Garmin radarInställningar"
 
-#: src/gradar_pi.cpp:859
+#: src/gradar_pi.cpp:834
 msgid "Garmin Radar PlugIn for OpenCPN"
 msgstr "Garmin Radarmodul för OpenCPN"
 
-#: src/gradar_pi.cpp:864
+#: src/gradar_pi.cpp:839
 msgid "Garmin Radar PlugIn for OpenCPN\n"
 msgstr "Garmin Radarmodul för OpenCPN\n"
 
-#: src/gradar_pi.cpp:1088
+#: src/gradar_pi.cpp:1057
 msgid "No scanner activity, reverting to search\n"
 msgstr "Ingen scanneraktivitet, fortsätter söka\n"
 
-#: src/gradar_pi.cpp:2454
+#: src/gradar_pi.cpp:2540
 msgid "The Radar Overlay PlugIn requires OpenGL mode to be activated in Toolbox->Settings"
 msgstr "Överlagrad radarmodul kräver att OpenGL-läge är aktiverat i verktyg-> inställningar"
 
-#: src/gradar_pi.cpp:2467
+#: src/gradar_pi.cpp:2553
 msgid "The Radar Overlay PlugIn is unable to\n"
 "directly control the radar scanner.\n\n"
 msgstr "Radarmodulen kan inte ändra\n"
 "inställningarna för scannern.\n\n"
 
-#: src/gradar_pi.cpp:2468
+#: src/gradar_pi.cpp:2554
 msgid "Scanner is located at ip address: "
 msgstr "Skannern använder IP-adress: "
 
-#: src/gradar_pi.cpp:2471
+#: src/gradar_pi.cpp:2557
 msgid "Interfaces available on this computer are:\n"
 msgstr "På denna dator finns följande gränssnitt:\n"
 
@@ -305,7 +305,7 @@ msgid "Guard Zone Color"
 msgstr "Säkerhetszonens kulör"
 
 #: src/GRadarUI.cpp:496
-msgid "Guard ZoneTransparency"
+msgid "Guard Zone Transparency"
 msgstr "Säkerhetszonens transparens"
 
 #: src/GRadarUI.cpp:505
