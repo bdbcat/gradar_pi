@@ -128,6 +128,8 @@ private:
     void OnColorChanged( wxColourPickerEvent& event );
     void OnUpdateTranSlider(wxScrollEvent& event);
     void OnUpdateSensitivitySlider(wxScrollEvent& event);
+    void OnAlarmSelect( wxCommandEvent& event );
+    void OnAlarmTest( wxCommandEvent& event );
 	void OnSentryCloseClick( wxCommandEvent& event );
 
 
@@ -147,7 +149,7 @@ private:
     void OnClose( wxCloseEvent& event );
     void OnSize( wxSizeEvent& event );
     void OnMove( wxMoveEvent& event );
-//    void OnAlarmSilenceClick( wxCommandEvent& event );
+    void OnAlarmSilenceClick( wxCommandEvent& event );
 //    void OnAlarmAckClick( wxCommandEvent& event );    
 	void OnAlarmCloseClick( wxCommandEvent& event );
 

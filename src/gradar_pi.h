@@ -397,6 +397,8 @@ public:
 
      wxColour m_guardzone_color;
      wxColour m_scan_color;
+     wxString m_alert_audio_file;
+     bool m_balarm_silence;
 
 private:
      bool CheckHostAccessible(wxString &hostname);

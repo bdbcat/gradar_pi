@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Nov  6 2013)
+// C++ code generated with wxFormBuilder (version Jun 17 2015)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -182,6 +182,8 @@ class SentryDialogBase : public wxDialog
 		wxColourPickerCtrl* m_colorpicker;
 		wxSlider* pGZTranSlider;
 		wxSlider* AlarmSensitivitySlider;
+		wxButton* AlarmSelectButton;
+		wxButton* AlarmTestButton;
 		wxButton* closebutton;
 		
 		// Virtual event handlers, overide them in your derived class
@@ -199,12 +201,14 @@ class SentryDialogBase : public wxDialog
 		virtual void OnColorChanged( wxColourPickerEvent& event ) { event.Skip(); }
 		virtual void OnUpdateTranSlider( wxScrollEvent& event ) { event.Skip(); }
 		virtual void OnUpdateSensitivitySlider( wxScrollEvent& event ) { event.Skip(); }
+		virtual void OnAlarmSelect( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnAlarmTest( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnSentryCloseClick( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		SentryDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Sentry Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 241,534 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		SentryDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Sentry Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 241,754 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~SentryDialogBase();
 	
 };
@@ -218,17 +222,19 @@ class SentryAlarmDialogBase : public wxDialog
 	
 	protected:
 		wxStaticText* m_staticText1;
+		wxButton* SilenceButton;
 		wxButton* closebutton;
 		
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnClose( wxCloseEvent& event ) { event.Skip(); }
 		virtual void OnSize( wxSizeEvent& event ) { event.Skip(); }
+		virtual void OnAlarmSilenceClick( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnAlarmCloseClick( wxCommandEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		
-		SentryAlarmDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("RadarSentryAlarm"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 281,142 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
+		SentryAlarmDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("RadarSentryAlarm"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 281,166 ), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER ); 
 		~SentryAlarmDialogBase();
 	
 };
