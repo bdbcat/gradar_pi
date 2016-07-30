@@ -112,6 +112,7 @@ int   g_prev_radar_state;
 int   g_sweep_count;
 int   g_radar_state;
 int   g_warmup_timer;
+int   g_dome_error;
 int   g_last_warmup_timer;
 int   g_scanner_state;
 int   g_pseudo_tick;
@@ -620,14 +621,6 @@ int gradar_pi::Init(void)
      grLogMessage(_T("gradar_pi log opened\n"));
 
      AddLocaleCatalog( _T("opencpn-gradar_pi") );
-
-     // Set some default private member parameters
-     m_Control_dialog_x = 0;
-     m_Control_dialog_y= 0;
-     m_Control_dialog_sx = 200;
-     m_Control_dialog_sy = 200;
-
-     ::wxDisplaySize(&m_display_width, &m_display_height);
 
      SetScanColor( wxColour(255, 0, 0) );
 
@@ -1897,6 +1890,9 @@ void gradar_pi::UpdateState(void)
      case 5:
           scan_state = _T("Spinup");
           break;
+     case 6:
+          scan_state = _T("Dome Error");
+          break;
      case 7:
           scan_state = _T("TT TX Active");
           break;
@@ -1969,6 +1965,8 @@ void gradar_pi::UpdateState(void)
                msg.Printf(_T("Scan packets per tick: %d\n"), g_scan_packets_per_tick );
                grLogMessage( msg );
           }
+          if(g_scanner_state == 6)
+              LogDomeError( g_dome_error );
      }
 
      g_prev_radar_state = g_radar_state;
@@ -2105,6 +2103,65 @@ void gradar_pi::UpdateState(void)
      default:
           break;
      }
+}
+
+void gradar_pi::LogDomeError(int dome_error)
+{
+    wxString msge;
+    msge.Printf( _T( "Dome error number = %d  " ), dome_error );
+
+    wxString err_mess;
+
+    switch (dome_error) {
+        case 0:
+            err_mess = _T( "Antenna rotation error" );
+            break;
+        case 1:
+            err_mess = _T( "Magnetron heater current error" );
+            break;
+        case 2:
+            err_mess = _T( "Magnetron current error" );
+            break;
+        case 3:
+            err_mess = _T( "Over temperature error" );
+            break;
+        case 4:
+            err_mess = _T( "Limiter error" );
+            break;
+        case 5:
+            err_mess = _T( "AFC error" );
+            break;
+        case 6:
+            err_mess = _T( "Magnetron high voltage error" );
+            break;
+        case 7:
+            err_mess = _T( "36 volt dc-dc converter error" );
+            break;
+        case 8:
+            err_mess = _T( "Motor error" );
+            break;
+        case 9:
+            err_mess = _T( "Motor stall error" );
+            break;
+        case 10:
+            err_mess = _T( "Motor hardware error" );
+            break;
+        case 11:
+            err_mess = _T( "Motor start error" );
+            break;
+        case 12:
+            err_mess = _T( "Motor stop error" );
+            break;
+        case 13:
+            err_mess = _T( "General motor fault" );
+            break;
+        default:
+            err_mess = _T( "Unknown error" );
+            break;
+    }
+    msge += err_mess;
+    msge += _T( "\n" );
+    grLogMessage( msge );
 }
 
 void gradar_pi::Select_Range(double range_nm)
@@ -2678,7 +2735,7 @@ void* MulticastRXThread::Entry()
           //       printf(" bytes read %d\n", m_sock->LastCount());
 
           if(m_sock->LastCount()) {
-               grLogMessage(_T("->gradar_pi: First Packet Rx"));
+               grLogMessage(_T("gradar_pi: First Packet Rx\n"));
                n_rx_once++;
 
                process_buffer();
@@ -2796,6 +2853,7 @@ void MulticastRXThread::process_buffer(void)
                memcpy(&packet, buf, sizeof(rad_status_pkt));
                g_scanner_state = packet.parm1;
                g_warmup_timer = packet.parm2;
+               g_dome_error = packet.parm2;
 
                break;
           }
