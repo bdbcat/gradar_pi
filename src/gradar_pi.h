@@ -326,6 +326,7 @@ public:
      bool LoadConfig(void);
      bool SaveConfig(void);
      void Notify();
+     void LogDomeError(int);
 
 
      int   m_range_control_mode;
@@ -423,7 +424,6 @@ private:
      wxWindow         *m_parent_window;
      wxMenu           *m_pmenu;
 
-     int              m_display_width, m_display_height;
      int              m_tool_id;
      bool              m_bShowIcon;
      wxBitmap          *m_pdeficon;
