@@ -1005,6 +1005,7 @@ void gradar_pi::OnSentryAlarmDialogClose()
 {
      if(m_pSentryAlarmDialog->IsShown())
           m_pSentryAlarmDialog->Hide();
+     m_balarm_silence = false;
      SaveConfig();
 }
 
@@ -1168,9 +1169,9 @@ bool gradar_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp)
                if(m_pSentryDialog->IsShown())m_pSentryDialog->SentryDialogShow();
      }
 
-         if(((g_radar_state == RADAR_TX_ACTIVE)||(g_radar_state == RADAR_TT_TX_ACTIVE)) &&
-              (!(!m_bmaster && (m_slave_display_mode == SLAVE_DISPLAY_OFF)))) {
-     //if(TRUE){
+     if(((g_radar_state == RADAR_TX_ACTIVE)||(g_radar_state == RADAR_TT_TX_ACTIVE)) &&
+         (!(!m_bmaster && (m_slave_display_mode == SLAVE_DISPLAY_OFF)))) {
+
           double max_distance = 0;
           wxPoint radar_center(vp->pix_width/2, vp->pix_height/2);
           if(m_bpos_set)
@@ -1419,7 +1420,10 @@ void gradar_pi::RenderRadarBuffer(unsigned char *buffer, int buffer_line_length,
                m_pSentryAlarmDialog->Show();
           }
           m_pSentryAlarmDialog->Show();
-          wxBell();
+
+          if (!m_alert_audio_file.IsEmpty() && !m_balarm_silence) {
+              PlugInPlaySound( m_alert_audio_file );
+          }
      }
 }
 
@@ -1669,11 +1673,12 @@ bool gradar_pi::LoadConfig(void)
           m_Sentry_dialog_x =  pConf->Read ( _T ( "SentryDialogPosX" ), 161L );
           m_Sentry_dialog_y =  pConf->Read ( _T ( "SentryDialogPosY" ), 254L );
 
-          m_Sentry_Alarm_dialog_sx = pConf->Read ( _T ( "SentryAlarmDialogSizeX" ), 157L );
-          m_Sentry_Alarm_dialog_sy = pConf->Read ( _T ( "SentryAlarmDialogSizeY" ), 232L );
+          m_Sentry_Alarm_dialog_sx = pConf->Read ( _T ( "SentryAlarmDialogSizeX" ), 231L );
+          m_Sentry_Alarm_dialog_sy = pConf->Read ( _T ( "SentryAlarmDialogSizeY" ), 174L );
           m_Sentry_Alarm_dialog_x =  pConf->Read ( _T ( "SentryAlarmDialogPosX" ), 161L );
           m_Sentry_Alarm_dialog_y =  pConf->Read ( _T ( "SentryAlarmDialogPosY" ), 254L );
 
+          m_alert_audio_file = pConf->Read ( _T ( "AlertSoundFile" ), "" );
 
           return true;
      } else {
@@ -1722,8 +1727,9 @@ bool gradar_pi::SaveConfig(void)
           pConf->Write ( _T ( "SentryAlarmDialogPosX" ),   m_Sentry_Alarm_dialog_x );
           pConf->Write ( _T ( "SentryAlarmDialogPosY" ),   m_Sentry_Alarm_dialog_y );
 
-          return true;
+          pConf->Write ( _T ( "AlertSoundFile" ), m_alert_audio_file );
 
+          return true;
      } else {
           return false;
      }

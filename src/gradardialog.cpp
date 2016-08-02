@@ -548,6 +548,30 @@ void SentryDialog::OnUpdateSensitivitySlider(wxScrollEvent &event)
     pPlugIn->m_sentry_alarm_sensitivity = AlarmSensitivitySlider->GetValue();
 }
 
+void SentryDialog::OnAlarmSelect( wxCommandEvent &event )
+{
+    wxString *sharedData = GetpSharedDataLocation();
+    wxString sound_dir;
+    sound_dir.append( *sharedData );
+    sound_dir.Append( _T( "sounds" ) );
+
+    wxFileDialog* popenDialog = new wxFileDialog(
+        NULL, _( "Select Sound File" ), sound_dir, wxEmptyString,
+        _T( "WAV files (*.wav)|*.wav|All files (*.*)|*.*" ), wxFD_OPEN );
+
+    int response = popenDialog->ShowModal();
+    if (response == wxID_OK)
+        pPlugIn->m_alert_audio_file = popenDialog->GetPath();
+}
+
+void SentryDialog::OnAlarmTest( wxCommandEvent &event )
+{
+    if (!pPlugIn->m_alert_audio_file.IsEmpty())
+        PlugInPlaySound( pPlugIn->m_alert_audio_file );
+}
+
+
+
 
 void SentryDialog::OnSentryCloseClick( wxCommandEvent& event )
 {
@@ -614,6 +638,11 @@ void SentryAlarmDialog::OnMove ( wxMoveEvent& event )
     pPlugIn->SetSentryAlarmDialogX(p.x);
     pPlugIn->SetSentryAlarmDialogY(p.y);
     event.Skip();
+}
+
+void SentryAlarmDialog::OnAlarmSilenceClick( wxCommandEvent& event )
+{
+    pPlugIn->m_balarm_silence = true;
 }
 
 void SentryAlarmDialog::OnAlarmCloseClick( wxCommandEvent& event )

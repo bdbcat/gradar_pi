@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Nov  6 2013)
+// C++ code generated with wxFormBuilder (version Jun 17 2015)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO "NOT" EDIT THIS FILE!
@@ -16,15 +16,17 @@ ControlDialogBase::ControlDialogBase( wxWindow* parent, wxWindowID id, const wxS
 	wxBoxSizer* topsizer;
 	topsizer = new wxBoxSizer( wxVERTICAL );
 	
+	m_scrolledWindow2 = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
+	m_scrolledWindow2->SetScrollRate( 5, 5 );
 	wxBoxSizer* boxsizer;
 	boxsizer = new wxBoxSizer( wxVERTICAL );
 	
 	wxStaticBoxSizer* BoxSizerOpOpt;
-	BoxSizerOpOpt = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Operational Control") ), wxVERTICAL );
+	BoxSizerOpOpt = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow2, wxID_ANY, _("Operational Control") ), wxVERTICAL );
 	
 	wxString pOperatingModeChoices[] = { _("Master Mode"), _("Slave Mode") };
 	int pOperatingModeNChoices = sizeof( pOperatingModeChoices ) / sizeof( wxString );
-	pOperatingMode = new wxRadioBox( this, wxID_ANY, _("Operating Mode"), wxDefaultPosition, wxDefaultSize, pOperatingModeNChoices, pOperatingModeChoices, 1, wxRA_SPECIFY_COLS );
+	pOperatingMode = new wxRadioBox( BoxSizerOpOpt->GetStaticBox(), wxID_ANY, _("Operating Mode"), wxDefaultPosition, wxDefaultSize, pOperatingModeNChoices, pOperatingModeChoices, 1, wxRA_SPECIFY_COLS );
 	pOperatingMode->SetSelection( 0 );
 	BoxSizerOpOpt->Add( pOperatingMode, 0, wxALL, 5 );
 	
@@ -32,27 +34,27 @@ ControlDialogBase::ControlDialogBase( wxWindow* parent, wxWindowID id, const wxS
 	boxsizer->Add( BoxSizerOpOpt, 0, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* StaticBoxSizerDisOpt;
-	StaticBoxSizerDisOpt = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Display Options") ), wxVERTICAL );
+	StaticBoxSizerDisOpt = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow2, wxID_ANY, _("Display Options") ), wxVERTICAL );
 	
 	wxString pUpdateModeChoices[] = { _("Swept Scan Update"), _("Full Scan Update") };
 	int pUpdateModeNChoices = sizeof( pUpdateModeChoices ) / sizeof( wxString );
-	pUpdateMode = new wxRadioBox( this, wxID_ANY, _("Scan Update Method"), wxDefaultPosition, wxDefaultSize, pUpdateModeNChoices, pUpdateModeChoices, 1, wxRA_SPECIFY_COLS );
+	pUpdateMode = new wxRadioBox( StaticBoxSizerDisOpt->GetStaticBox(), wxID_ANY, _("Scan Update Method"), wxDefaultPosition, wxDefaultSize, pUpdateModeNChoices, pUpdateModeChoices, 1, wxRA_SPECIFY_COLS );
 	pUpdateMode->SetSelection( 0 );
 	StaticBoxSizerDisOpt->Add( pUpdateMode, 0, wxALL, 5 );
 	
 	wxStaticBoxSizer* sbSizer26;
-	sbSizer26 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Scan Color") ), wxVERTICAL );
+	sbSizer26 = new wxStaticBoxSizer( new wxStaticBox( StaticBoxSizerDisOpt->GetStaticBox(), wxID_ANY, _("Scan Color") ), wxVERTICAL );
 	
-	scancolorpicker = new wxColourPickerCtrl( this, wxID_ANY, wxColour( 255, 0, 0 ), wxDefaultPosition, wxSize( -1,-1 ), wxCLRP_DEFAULT_STYLE|wxCLRP_USE_TEXTCTRL );
+	scancolorpicker = new wxColourPickerCtrl( sbSizer26->GetStaticBox(), wxID_ANY, wxColour( 255, 0, 0 ), wxDefaultPosition, wxSize( -1,-1 ), wxCLRP_DEFAULT_STYLE|wxCLRP_USE_TEXTCTRL );
 	sbSizer26->Add( scancolorpicker, 0, wxALL, 5 );
 	
 	
 	StaticBoxSizerDisOpt->Add( sbSizer26, 1, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* transliderboxsizer;
-	transliderboxsizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Scan Transparency") ), wxVERTICAL );
+	transliderboxsizer = new wxStaticBoxSizer( new wxStaticBox( StaticBoxSizerDisOpt->GetStaticBox(), wxID_ANY, _("Scan Transparency") ), wxVERTICAL );
 	
-	pTranSlider = new wxSlider( this, wxID_ANY, 90, 10, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
+	pTranSlider = new wxSlider( transliderboxsizer->GetStaticBox(), wxID_ANY, 90, 10, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
 	transliderboxsizer->Add( pTranSlider, 1, wxEXPAND, 5 );
 	
 	
@@ -61,26 +63,29 @@ ControlDialogBase::ControlDialogBase( wxWindow* parent, wxWindowID id, const wxS
 	
 	boxsizer->Add( StaticBoxSizerDisOpt, 0, wxEXPAND, 5 );
 	
-	pCB_Log = new wxCheckBox( this, wxID_ANY, _("Enable gradar Log"), wxDefaultPosition, wxDefaultSize, 0 );
+	pCB_Log = new wxCheckBox( m_scrolledWindow2, wxID_ANY, _("Enable gradar Log"), wxDefaultPosition, wxDefaultSize, 0 );
 	boxsizer->Add( pCB_Log, 0, wxALL, 5 );
 	
-	RangeButton = new wxButton( this, wxID_ANY, _("Range Control"), wxDefaultPosition, wxDefaultSize, 0 );
+	RangeButton = new wxButton( m_scrolledWindow2, wxID_ANY, _("Range Control"), wxDefaultPosition, wxDefaultSize, 0 );
 	boxsizer->Add( RangeButton, 0, wxALL, 5 );
 	
-	NoiseButton = new wxButton( this, wxID_ANY, _("Noise Control"), wxDefaultPosition, wxDefaultSize, 0 );
+	NoiseButton = new wxButton( m_scrolledWindow2, wxID_ANY, _("Noise Control"), wxDefaultPosition, wxDefaultSize, 0 );
 	boxsizer->Add( NoiseButton, 0, wxALL, 5 );
 	
-	DomeButton = new wxButton( this, wxID_ANY, _("Dome Control"), wxDefaultPosition, wxDefaultSize, 0 );
+	DomeButton = new wxButton( m_scrolledWindow2, wxID_ANY, _("Dome Control"), wxDefaultPosition, wxDefaultSize, 0 );
 	boxsizer->Add( DomeButton, 0, wxALL, 5 );
 	
-	SentryButton = new wxButton( this, wxID_ANY, _("Sentry Control"), wxDefaultPosition, wxDefaultSize, 0 );
+	SentryButton = new wxButton( m_scrolledWindow2, wxID_ANY, _("Sentry Control"), wxDefaultPosition, wxDefaultSize, 0 );
 	boxsizer->Add( SentryButton, 0, wxALL, 5 );
 	
-	closebutton = new wxButton( this, wxID_ANY, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
+	closebutton = new wxButton( m_scrolledWindow2, wxID_ANY, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
 	boxsizer->Add( closebutton, 0, wxALL, 5 );
 	
 	
-	topsizer->Add( boxsizer, 1, wxEXPAND, 5 );
+	m_scrolledWindow2->SetSizer( boxsizer );
+	m_scrolledWindow2->Layout();
+	boxsizer->Fit( m_scrolledWindow2 );
+	topsizer->Add( m_scrolledWindow2, 1, wxEXPAND, 5 );
 	
 	
 	this->SetSizer( topsizer );
@@ -128,21 +133,23 @@ RangeDialogBase::RangeDialogBase( wxWindow* parent, wxWindowID id, const wxStrin
 	wxBoxSizer* bSizer3;
 	bSizer3 = new wxBoxSizer( wxVERTICAL );
 	
+	m_scrolledWindow3 = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
+	m_scrolledWindow3->SetScrollRate( 5, 5 );
 	wxBoxSizer* bSizer4;
 	bSizer4 = new wxBoxSizer( wxVERTICAL );
 	
 	wxStaticBoxSizer* sbSizer6;
-	sbSizer6 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Range Setting") ), wxVERTICAL );
+	sbSizer6 = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow3, wxID_ANY, _("Range Setting") ), wxVERTICAL );
 	
 	wxString pRangeControlChoices[] = { _("Auto"), _("Manual") };
 	int pRangeControlNChoices = sizeof( pRangeControlChoices ) / sizeof( wxString );
-	pRangeControl = new wxRadioBox( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, pRangeControlNChoices, pRangeControlChoices, 1, wxRA_SPECIFY_ROWS );
+	pRangeControl = new wxRadioBox( sbSizer6->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, pRangeControlNChoices, pRangeControlChoices, 1, wxRA_SPECIFY_ROWS );
 	pRangeControl->SetSelection( 0 );
 	sbSizer6->Add( pRangeControl, 0, wxALL, 5 );
 	
 	wxString pRangeSelectChoices[] = { _(".125"), _(".25"), _(".50"), _(".75"), _("1.0"), _("1.5"), _("2"), _("3"), _("4"), _("6"), _("8"), _("12"), _("16"), _("24"), _("36"), _("48") };
 	int pRangeSelectNChoices = sizeof( pRangeSelectChoices ) / sizeof( wxString );
-	pRangeSelect = new wxRadioBox( this, wxID_ANY, _("Range Miles"), wxDefaultPosition, wxDefaultSize, pRangeSelectNChoices, pRangeSelectChoices, 2, wxRA_SPECIFY_COLS );
+	pRangeSelect = new wxRadioBox( sbSizer6->GetStaticBox(), wxID_ANY, _("Range Miles"), wxDefaultPosition, wxDefaultSize, pRangeSelectNChoices, pRangeSelectChoices, 2, wxRA_SPECIFY_COLS );
 	pRangeSelect->SetSelection( 1 );
 	sbSizer6->Add( pRangeSelect, 0, wxALL|wxEXPAND, 5 );
 	
@@ -150,31 +157,28 @@ RangeDialogBase::RangeDialogBase( wxWindow* parent, wxWindowID id, const wxStrin
 	bSizer4->Add( sbSizer6, 0, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer51;
-	sbSizer51 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Gain") ), wxVERTICAL );
+	sbSizer51 = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow3, wxID_ANY, _("Gain") ), wxVERTICAL );
 	
 	wxString GainControlSelectChoices[] = { _("Auto"), _("Manual") };
 	int GainControlSelectNChoices = sizeof( GainControlSelectChoices ) / sizeof( wxString );
-	GainControlSelect = new wxRadioBox( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, GainControlSelectNChoices, GainControlSelectChoices, 1, wxRA_SPECIFY_ROWS );
+	GainControlSelect = new wxRadioBox( sbSizer51->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, GainControlSelectNChoices, GainControlSelectChoices, 1, wxRA_SPECIFY_ROWS );
 	GainControlSelect->SetSelection( 0 );
 	sbSizer51->Add( GainControlSelect, 0, wxALL, 5 );
 	
-	GainLevel = new wxSlider( this, wxID_ANY, 50, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
+	GainLevel = new wxSlider( sbSizer51->GetStaticBox(), wxID_ANY, 50, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
 	sbSizer51->Add( GainLevel, 0, wxEXPAND, 5 );
 	
 	
 	bSizer4->Add( sbSizer51, 0, wxEXPAND, 5 );
 	
-	wxStaticBoxSizer* sbSizer16;
-	sbSizer16 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxEmptyString ), wxVERTICAL );
-	
-	closebutton = new wxButton( this, wxID_ANY, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer16->Add( closebutton, 0, wxALL, 5 );
+	closebutton = new wxButton( m_scrolledWindow3, wxID_ANY, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer4->Add( closebutton, 0, wxALL, 5 );
 	
 	
-	bSizer4->Add( sbSizer16, 0, wxEXPAND, 5 );
-	
-	
-	bSizer3->Add( bSizer4, 1, wxEXPAND, 5 );
+	m_scrolledWindow3->SetSizer( bSizer4 );
+	m_scrolledWindow3->Layout();
+	bSizer4->Fit( m_scrolledWindow3 );
+	bSizer3->Add( m_scrolledWindow3, 1, wxEXPAND, 5 );
 	
 	
 	this->SetSizer( bSizer3 );
@@ -212,68 +216,67 @@ NoiseDialogBase::NoiseDialogBase( wxWindow* parent, wxWindowID id, const wxStrin
 	wxBoxSizer* bSizer6;
 	bSizer6 = new wxBoxSizer( wxVERTICAL );
 	
-	wxBoxSizer* bSizer5;
-	bSizer5 = new wxBoxSizer( wxVERTICAL );
+	m_scrolledWindow1 = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
+	m_scrolledWindow1->SetScrollRate( 5, 5 );
+	wxBoxSizer* bSizer15;
+	bSizer15 = new wxBoxSizer( wxVERTICAL );
 	
 	wxStaticBoxSizer* sbSizer6;
-	sbSizer6 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("SeaClutter Sensitivity Time Control") ), wxVERTICAL );
+	sbSizer6 = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow1, wxID_ANY, _("SeaClutter Sensitivity Time Control") ), wxVERTICAL );
 	
 	wxString SeaClutterModeSelectChoices[] = { _("Man"), _("Calm"), _("Med"), _("High") };
 	int SeaClutterModeSelectNChoices = sizeof( SeaClutterModeSelectChoices ) / sizeof( wxString );
-	SeaClutterModeSelect = new wxRadioBox( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, SeaClutterModeSelectNChoices, SeaClutterModeSelectChoices, 1, wxRA_SPECIFY_ROWS );
+	SeaClutterModeSelect = new wxRadioBox( sbSizer6->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, SeaClutterModeSelectNChoices, SeaClutterModeSelectChoices, 1, wxRA_SPECIFY_ROWS );
 	SeaClutterModeSelect->SetSelection( 0 );
 	sbSizer6->Add( SeaClutterModeSelect, 0, 0, 5 );
 	
-	SeaClutterLevel = new wxSlider( this, wxID_ANY, 50, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
+	SeaClutterLevel = new wxSlider( sbSizer6->GetStaticBox(), wxID_ANY, 50, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
 	sbSizer6->Add( SeaClutterLevel, 0, wxEXPAND, 5 );
 	
 	
-	bSizer5->Add( sbSizer6, 0, wxEXPAND, 5 );
+	bSizer15->Add( sbSizer6, 0, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer7;
-	sbSizer7 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("FTC Fast Time Constant") ), wxVERTICAL );
+	sbSizer7 = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow1, wxID_ANY, _("FTC Fast Time Constant") ), wxVERTICAL );
 	
 	wxString FTCModeSelectChoices[] = { _("Off"), _("Low"), _("Med"), _("High") };
 	int FTCModeSelectNChoices = sizeof( FTCModeSelectChoices ) / sizeof( wxString );
-	FTCModeSelect = new wxRadioBox( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, FTCModeSelectNChoices, FTCModeSelectChoices, 1, wxRA_SPECIFY_ROWS );
+	FTCModeSelect = new wxRadioBox( sbSizer7->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, FTCModeSelectNChoices, FTCModeSelectChoices, 1, wxRA_SPECIFY_ROWS );
 	FTCModeSelect->SetSelection( 0 );
 	sbSizer7->Add( FTCModeSelect, 1, wxALL, 5 );
 	
 	
-	bSizer5->Add( sbSizer7, 0, wxEXPAND, 5 );
+	bSizer15->Add( sbSizer7, 0, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer8;
-	sbSizer8 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("RainClutter") ), wxVERTICAL );
+	sbSizer8 = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow1, wxID_ANY, _("RainClutter") ), wxVERTICAL );
 	
-	RainClutterLevel = new wxSlider( this, wxID_ANY, 50, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
+	RainClutterLevel = new wxSlider( sbSizer8->GetStaticBox(), wxID_ANY, 50, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
 	sbSizer8->Add( RainClutterLevel, 1, wxEXPAND, 5 );
 	
 	
-	bSizer5->Add( sbSizer8, 0, wxEXPAND, 5 );
+	bSizer15->Add( sbSizer8, 0, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer9;
-	sbSizer9 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Crosstalk") ), wxVERTICAL );
+	sbSizer9 = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow1, wxID_ANY, _("Crosstalk") ), wxVERTICAL );
 	
 	wxString CrosstalkOnOffChoices[] = { _("Off"), _("On") };
 	int CrosstalkOnOffNChoices = sizeof( CrosstalkOnOffChoices ) / sizeof( wxString );
-	CrosstalkOnOff = new wxRadioBox( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, CrosstalkOnOffNChoices, CrosstalkOnOffChoices, 1, wxRA_SPECIFY_ROWS );
+	CrosstalkOnOff = new wxRadioBox( sbSizer9->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, CrosstalkOnOffNChoices, CrosstalkOnOffChoices, 1, wxRA_SPECIFY_ROWS );
 	CrosstalkOnOff->SetSelection( 0 );
 	sbSizer9->Add( CrosstalkOnOff, 0, wxALL, 5 );
 	
 	
-	bSizer5->Add( sbSizer9, 0, wxEXPAND, 5 );
+	bSizer15->Add( sbSizer9, 0, wxEXPAND, 5 );
 	
-	wxStaticBoxSizer* sbSizer17;
-	sbSizer17 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxEmptyString ), wxVERTICAL );
-	
-	closebutton = new wxButton( this, wxID_ANY, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer17->Add( closebutton, 0, wxALL, 5 );
+	closebutton = new wxButton( m_scrolledWindow1, wxID_ANY, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer15->Add( closebutton, 0, wxALL, 5 );
 	
 	
-	bSizer5->Add( sbSizer17, 0, wxEXPAND, 5 );
-	
-	
-	bSizer6->Add( bSizer5, 0, wxEXPAND, 5 );
+	m_scrolledWindow1->SetSizer( bSizer15 );
+	m_scrolledWindow1->Layout();
+	bSizer15->Fit( m_scrolledWindow1 );
+	bSizer6->Add( m_scrolledWindow1, 1, wxEXPAND, 5 );
 	
 	
 	this->SetSizer( bSizer6 );
@@ -313,41 +316,40 @@ DomeDialogBase::DomeDialogBase( wxWindow* parent, wxWindowID id, const wxString&
 	wxBoxSizer* bSizer7;
 	bSizer7 = new wxBoxSizer( wxVERTICAL );
 	
+	m_scrolledWindow4 = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
+	m_scrolledWindow4->SetScrollRate( 5, 5 );
 	wxBoxSizer* bSizer8;
 	bSizer8 = new wxBoxSizer( wxVERTICAL );
 	
 	wxStaticBoxSizer* sbSizer12;
-	sbSizer12 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Dome Offset") ), wxVERTICAL );
+	sbSizer12 = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow4, wxID_ANY, _("Dome Offset") ), wxVERTICAL );
 	
-	DomeOffsetSelect = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, -90, 90, 0 );
+	DomeOffsetSelect = new wxSpinCtrl( sbSizer12->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, -90, 90, 0 );
 	sbSizer12->Add( DomeOffsetSelect, 0, wxALL, 5 );
 	
 	
 	bSizer8->Add( sbSizer12, 0, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer13;
-	sbSizer13 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Dome Speed") ), wxVERTICAL );
+	sbSizer13 = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow4, wxID_ANY, _("Dome Speed") ), wxVERTICAL );
 	
 	wxString DomeSpeedSelectChoices[] = { _("24"), _("30") };
 	int DomeSpeedSelectNChoices = sizeof( DomeSpeedSelectChoices ) / sizeof( wxString );
-	DomeSpeedSelect = new wxRadioBox( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, DomeSpeedSelectNChoices, DomeSpeedSelectChoices, 1, wxRA_SPECIFY_ROWS );
+	DomeSpeedSelect = new wxRadioBox( sbSizer13->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, DomeSpeedSelectNChoices, DomeSpeedSelectChoices, 1, wxRA_SPECIFY_ROWS );
 	DomeSpeedSelect->SetSelection( 0 );
 	sbSizer13->Add( DomeSpeedSelect, 0, wxALL, 5 );
 	
 	
 	bSizer8->Add( sbSizer13, 0, wxEXPAND, 5 );
 	
-	wxStaticBoxSizer* sbSizer14;
-	sbSizer14 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxEmptyString ), wxVERTICAL );
-	
-	closebutton = new wxButton( this, wxID_ANY, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer14->Add( closebutton, 0, wxALL, 5 );
+	closebutton = new wxButton( m_scrolledWindow4, wxID_ANY, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer8->Add( closebutton, 0, wxALL, 5 );
 	
 	
-	bSizer8->Add( sbSizer14, 0, wxEXPAND, 5 );
-	
-	
-	bSizer7->Add( bSizer8, 0, wxEXPAND, 5 );
+	m_scrolledWindow4->SetSizer( bSizer8 );
+	m_scrolledWindow4->Layout();
+	bSizer8->Fit( m_scrolledWindow4 );
+	bSizer7->Add( m_scrolledWindow4, 1, wxEXPAND, 5 );
 	
 	
 	this->SetSizer( bSizer7 );
@@ -381,15 +383,17 @@ SentryDialogBase::SentryDialogBase( wxWindow* parent, wxWindowID id, const wxStr
 	wxBoxSizer* bSizer9;
 	bSizer9 = new wxBoxSizer( wxVERTICAL );
 	
+	m_scrolledWindow5 = new wxScrolledWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxHSCROLL|wxVSCROLL );
+	m_scrolledWindow5->SetScrollRate( 5, 5 );
 	wxBoxSizer* bSizer10;
 	bSizer10 = new wxBoxSizer( wxVERTICAL );
 	
 	wxStaticBoxSizer* sbSizer15;
-	sbSizer15 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Timed Transmit") ), wxVERTICAL );
+	sbSizer15 = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow5, wxID_ANY, _("Timed Transmit") ), wxVERTICAL );
 	
 	wxString TimedTransmitChoices[] = { _("Off"), _("On") };
 	int TimedTransmitNChoices = sizeof( TimedTransmitChoices ) / sizeof( wxString );
-	TimedTransmit = new wxRadioBox( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, TimedTransmitNChoices, TimedTransmitChoices, 1, wxRA_SPECIFY_ROWS );
+	TimedTransmit = new wxRadioBox( sbSizer15->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, TimedTransmitNChoices, TimedTransmitChoices, 1, wxRA_SPECIFY_ROWS );
 	TimedTransmit->SetSelection( 0 );
 	sbSizer15->Add( TimedTransmit, 0, wxALL, 5 );
 	
@@ -397,35 +401,35 @@ SentryDialogBase::SentryDialogBase( wxWindow* parent, wxWindowID id, const wxStr
 	bSizer12 = new wxBoxSizer( wxHORIZONTAL );
 	
 	wxStaticBoxSizer* sbSizer16;
-	sbSizer16 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Standby Minutes") ), wxVERTICAL );
+	sbSizer16 = new wxStaticBoxSizer( new wxStaticBox( sbSizer15->GetStaticBox(), wxID_ANY, _("Standby Minutes") ), wxVERTICAL );
 	
-	StandbyMinutes = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, 1, 250, 20 );
+	StandbyMinutes = new wxSpinCtrl( sbSizer16->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, 1, 250, 20 );
 	sbSizer16->Add( StandbyMinutes, 0, wxALL, 5 );
 	
 	
-	bSizer12->Add( sbSizer16, 1, wxEXPAND, 5 );
+	bSizer12->Add( sbSizer16, 0, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer17;
-	sbSizer17 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Transmit Minutes") ), wxVERTICAL );
+	sbSizer17 = new wxStaticBoxSizer( new wxStaticBox( sbSizer15->GetStaticBox(), wxID_ANY, _("Transmit Minutes") ), wxVERTICAL );
 	
-	TransmitMinutes = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, 1, 60, 2 );
+	TransmitMinutes = new wxSpinCtrl( sbSizer17->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, 1, 60, 2 );
 	sbSizer17->Add( TransmitMinutes, 0, wxALL, 5 );
 	
 	
-	bSizer12->Add( sbSizer17, 1, wxEXPAND, 5 );
+	bSizer12->Add( sbSizer17, 0, wxEXPAND, 5 );
 	
 	
-	sbSizer15->Add( bSizer12, 1, wxEXPAND, 5 );
+	sbSizer15->Add( bSizer12, 0, wxEXPAND, 5 );
 	
 	
 	bSizer10->Add( sbSizer15, 0, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer18;
-	sbSizer18 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Guard Zone") ), wxVERTICAL );
+	sbSizer18 = new wxStaticBoxSizer( new wxStaticBox( m_scrolledWindow5, wxID_ANY, _("Guard Zone") ), wxVERTICAL );
 	
 	wxString GuardZoneOnOffChoices[] = { _("Off"), _("On") };
 	int GuardZoneOnOffNChoices = sizeof( GuardZoneOnOffChoices ) / sizeof( wxString );
-	GuardZoneOnOff = new wxRadioBox( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, GuardZoneOnOffNChoices, GuardZoneOnOffChoices, 1, wxRA_SPECIFY_ROWS );
+	GuardZoneOnOff = new wxRadioBox( sbSizer18->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, GuardZoneOnOffNChoices, GuardZoneOnOffChoices, 1, wxRA_SPECIFY_ROWS );
 	GuardZoneOnOff->SetSelection( 0 );
 	sbSizer18->Add( GuardZoneOnOff, 0, wxALL, 5 );
 	
@@ -433,18 +437,18 @@ SentryDialogBase::SentryDialogBase( wxWindow* parent, wxWindowID id, const wxStr
 	bSizer13 = new wxBoxSizer( wxHORIZONTAL );
 	
 	wxStaticBoxSizer* sbSizer19;
-	sbSizer19 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Outer Range Meters") ), wxVERTICAL );
+	sbSizer19 = new wxStaticBoxSizer( new wxStaticBox( sbSizer18->GetStaticBox(), wxID_ANY, _("Outer Range Meters") ), wxVERTICAL );
 	
-	OuterRange = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, 0, 20000, 0 );
+	OuterRange = new wxSpinCtrl( sbSizer19->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, 0, 20000, 0 );
 	sbSizer19->Add( OuterRange, 0, wxALL, 5 );
 	
 	
 	bSizer13->Add( sbSizer19, 1, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer20;
-	sbSizer20 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Inner Range Meters") ), wxHORIZONTAL );
+	sbSizer20 = new wxStaticBoxSizer( new wxStaticBox( sbSizer18->GetStaticBox(), wxID_ANY, _("Inner Range Meters") ), wxHORIZONTAL );
 	
-	InnerRange = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, 0, 20000, 0 );
+	InnerRange = new wxSpinCtrl( sbSizer20->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, 0, 20000, 0 );
 	sbSizer20->Add( InnerRange, 0, wxALL, 5 );
 	
 	
@@ -455,7 +459,7 @@ SentryDialogBase::SentryDialogBase( wxWindow* parent, wxWindowID id, const wxStr
 	
 	wxString PartialArcNoYesChoices[] = { _("No"), _("Yes") };
 	int PartialArcNoYesNChoices = sizeof( PartialArcNoYesChoices ) / sizeof( wxString );
-	PartialArcNoYes = new wxRadioBox( this, wxID_ANY, _("Partial Arc"), wxDefaultPosition, wxDefaultSize, PartialArcNoYesNChoices, PartialArcNoYesChoices, 1, wxRA_SPECIFY_ROWS );
+	PartialArcNoYes = new wxRadioBox( sbSizer18->GetStaticBox(), wxID_ANY, _("Partial Arc"), wxDefaultPosition, wxDefaultSize, PartialArcNoYesNChoices, PartialArcNoYesChoices, 1, wxRA_SPECIFY_ROWS );
 	PartialArcNoYes->SetSelection( 0 );
 	sbSizer18->Add( PartialArcNoYes, 0, wxALL, 5 );
 	
@@ -463,18 +467,18 @@ SentryDialogBase::SentryDialogBase( wxWindow* parent, wxWindowID id, const wxStr
 	bSizer14 = new wxBoxSizer( wxHORIZONTAL );
 	
 	wxStaticBoxSizer* sbSizer21;
-	sbSizer21 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Start Angle") ), wxVERTICAL );
+	sbSizer21 = new wxStaticBoxSizer( new wxStaticBox( sbSizer18->GetStaticBox(), wxID_ANY, _("Start Angle") ), wxVERTICAL );
 	
-	StartAngle = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, -360, 360, 0 );
+	StartAngle = new wxSpinCtrl( sbSizer21->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, -360, 360, 0 );
 	sbSizer21->Add( StartAngle, 0, wxALL, 5 );
 	
 	
 	bSizer14->Add( sbSizer21, 1, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer22;
-	sbSizer22 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("End Angle") ), wxVERTICAL );
+	sbSizer22 = new wxStaticBoxSizer( new wxStaticBox( sbSizer18->GetStaticBox(), wxID_ANY, _("End Angle") ), wxVERTICAL );
 	
-	EndAngle = new wxSpinCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, -360, 360, 0 );
+	EndAngle = new wxSpinCtrl( sbSizer22->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, -360, 360, 0 );
 	sbSizer22->Add( EndAngle, 0, wxALL, 5 );
 	
 	
@@ -484,46 +488,55 @@ SentryDialogBase::SentryDialogBase( wxWindow* parent, wxWindowID id, const wxStr
 	sbSizer18->Add( bSizer14, 0, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer24;
-	sbSizer24 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Guard Zone Color") ), wxVERTICAL );
+	sbSizer24 = new wxStaticBoxSizer( new wxStaticBox( sbSizer18->GetStaticBox(), wxID_ANY, _("Guard Zone Color") ), wxVERTICAL );
 	
-	m_colorpicker = new wxColourPickerCtrl( this, wxID_ANY, wxColour( 255, 255, 0 ), wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE|wxCLRP_USE_TEXTCTRL );
+	m_colorpicker = new wxColourPickerCtrl( sbSizer24->GetStaticBox(), wxID_ANY, wxColour( 255, 255, 0 ), wxDefaultPosition, wxDefaultSize, wxCLRP_DEFAULT_STYLE|wxCLRP_USE_TEXTCTRL );
 	sbSizer24->Add( m_colorpicker, 0, wxALL, 5 );
 	
 	
 	sbSizer18->Add( sbSizer24, 0, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* gztranpsizer;
-	gztranpsizer = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Guard Zone Transparency") ), wxVERTICAL );
+	gztranpsizer = new wxStaticBoxSizer( new wxStaticBox( sbSizer18->GetStaticBox(), wxID_ANY, _("Guard Zone Transparency") ), wxVERTICAL );
 	
-	pGZTranSlider = new wxSlider( this, wxID_ANY, 90, 10, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
+	pGZTranSlider = new wxSlider( gztranpsizer->GetStaticBox(), wxID_ANY, 90, 10, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
 	gztranpsizer->Add( pGZTranSlider, 1, wxEXPAND, 5 );
 	
 	
 	sbSizer18->Add( gztranpsizer, 0, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer29;
-	sbSizer29 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Alarm Sensitivity") ), wxVERTICAL );
+	sbSizer29 = new wxStaticBoxSizer( new wxStaticBox( sbSizer18->GetStaticBox(), wxID_ANY, _("Alarm Sensitivity") ), wxVERTICAL );
 	
-	AlarmSensitivitySlider = new wxSlider( this, wxID_ANY, 5, 1, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
+	AlarmSensitivitySlider = new wxSlider( sbSizer29->GetStaticBox(), wxID_ANY, 5, 1, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL|wxSL_LABELS );
 	sbSizer29->Add( AlarmSensitivitySlider, 0, wxEXPAND, 5 );
 	
 	
 	sbSizer18->Add( sbSizer29, 0, wxEXPAND, 5 );
 	
+	wxStaticBoxSizer* sbSizer30;
+	sbSizer30 = new wxStaticBoxSizer( new wxStaticBox( sbSizer18->GetStaticBox(), wxID_ANY, _("Alarm Sound") ), wxHORIZONTAL );
 	
-	bSizer10->Add( sbSizer18, 1, wxEXPAND, 5 );
+	AlarmSelectButton = new wxButton( sbSizer30->GetStaticBox(), wxID_ANY, _("Select"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer30->Add( AlarmSelectButton, 0, wxALL, 5 );
 	
-	wxStaticBoxSizer* sbSizer23;
-	sbSizer23 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxEmptyString ), wxVERTICAL );
-	
-	closebutton = new wxButton( this, wxID_ANY, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
-	sbSizer23->Add( closebutton, 0, wxALL, 5 );
-	
-	
-	bSizer10->Add( sbSizer23, 1, wxEXPAND, 5 );
+	AlarmTestButton = new wxButton( sbSizer30->GetStaticBox(), wxID_ANY, _("Test"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer30->Add( AlarmTestButton, 0, wxALL, 5 );
 	
 	
-	bSizer9->Add( bSizer10, 0, wxEXPAND, 5 );
+	sbSizer18->Add( sbSizer30, 0, wxEXPAND, 5 );
+	
+	
+	bSizer10->Add( sbSizer18, 0, wxEXPAND, 5 );
+	
+	closebutton = new wxButton( m_scrolledWindow5, wxID_ANY, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer10->Add( closebutton, 0, wxALL, 5 );
+	
+	
+	m_scrolledWindow5->SetSizer( bSizer10 );
+	m_scrolledWindow5->Layout();
+	bSizer10->Fit( m_scrolledWindow5 );
+	bSizer9->Add( m_scrolledWindow5, 1, wxEXPAND, 5 );
 	
 	
 	this->SetSizer( bSizer9 );
@@ -546,6 +559,8 @@ SentryDialogBase::SentryDialogBase( wxWindow* parent, wxWindowID id, const wxStr
 	m_colorpicker->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( SentryDialogBase::OnColorChanged ), NULL, this );
 	pGZTranSlider->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( SentryDialogBase::OnUpdateTranSlider ), NULL, this );
 	AlarmSensitivitySlider->Connect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( SentryDialogBase::OnUpdateSensitivitySlider ), NULL, this );
+	AlarmSelectButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SentryDialogBase::OnAlarmSelect ), NULL, this );
+	AlarmTestButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SentryDialogBase::OnAlarmTest ), NULL, this );
 	closebutton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SentryDialogBase::OnSentryCloseClick ), NULL, this );
 }
 
@@ -566,6 +581,8 @@ SentryDialogBase::~SentryDialogBase()
 	m_colorpicker->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( SentryDialogBase::OnColorChanged ), NULL, this );
 	pGZTranSlider->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( SentryDialogBase::OnUpdateTranSlider ), NULL, this );
 	AlarmSensitivitySlider->Disconnect( wxEVT_SCROLL_CHANGED, wxScrollEventHandler( SentryDialogBase::OnUpdateSensitivitySlider ), NULL, this );
+	AlarmSelectButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SentryDialogBase::OnAlarmSelect ), NULL, this );
+	AlarmTestButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SentryDialogBase::OnAlarmTest ), NULL, this );
 	closebutton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SentryDialogBase::OnSentryCloseClick ), NULL, this );
 	
 }
@@ -578,21 +595,24 @@ SentryAlarmDialogBase::SentryAlarmDialogBase( wxWindow* parent, wxWindowID id, c
 	bSizer14 = new wxBoxSizer( wxVERTICAL );
 	
 	wxStaticBoxSizer* sbSizer27;
-	sbSizer27 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxEmptyString ), wxHORIZONTAL );
+	sbSizer27 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxEmptyString ), wxVERTICAL );
 	
-	m_staticText1 = new wxStaticText( this, wxID_ANY, _("Radar Sentry Alarm"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE );
+	m_staticText1 = new wxStaticText( sbSizer27->GetStaticBox(), wxID_ANY, _("Radar Sentry Alarm"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE );
 	m_staticText1->Wrap( -1 );
 	m_staticText1->SetFont( wxFont( 15, 70, 90, 90, false, wxEmptyString ) );
 	
-	sbSizer27->Add( m_staticText1, 1, wxALL, 5 );
+	sbSizer27->Add( m_staticText1, 1, wxALIGN_CENTER|wxALL, 5 );
+	
+	SilenceButton = new wxButton( sbSizer27->GetStaticBox(), wxID_ANY, _("Silence"), wxDefaultPosition, wxDefaultSize, 0 );
+	sbSizer27->Add( SilenceButton, 0, wxALIGN_CENTER|wxALL|wxTOP, 5 );
 	
 	
-	bSizer14->Add( sbSizer27, 1, wxEXPAND, 5 );
+	bSizer14->Add( sbSizer27, 0, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer28;
 	sbSizer28 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxEmptyString ), wxHORIZONTAL );
 	
-	closebutton = new wxButton( this, wxID_ANY, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
+	closebutton = new wxButton( sbSizer28->GetStaticBox(), wxID_ANY, _("Close"), wxDefaultPosition, wxDefaultSize, 0 );
 	sbSizer28->Add( closebutton, 0, wxALL, 5 );
 	
 	
@@ -607,6 +627,7 @@ SentryAlarmDialogBase::SentryAlarmDialogBase( wxWindow* parent, wxWindowID id, c
 	// Connect Events
 	this->Connect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SentryAlarmDialogBase::OnClose ) );
 	this->Connect( wxEVT_SIZE, wxSizeEventHandler( SentryAlarmDialogBase::OnSize ) );
+	SilenceButton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SentryAlarmDialogBase::OnAlarmSilenceClick ), NULL, this );
 	closebutton->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SentryAlarmDialogBase::OnAlarmCloseClick ), NULL, this );
 }
 
@@ -615,6 +636,7 @@ SentryAlarmDialogBase::~SentryAlarmDialogBase()
 	// Disconnect Events
 	this->Disconnect( wxEVT_CLOSE_WINDOW, wxCloseEventHandler( SentryAlarmDialogBase::OnClose ) );
 	this->Disconnect( wxEVT_SIZE, wxSizeEventHandler( SentryAlarmDialogBase::OnSize ) );
+	SilenceButton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SentryAlarmDialogBase::OnAlarmSilenceClick ), NULL, this );
 	closebutton->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( SentryAlarmDialogBase::OnAlarmCloseClick ), NULL, this );
 	
 }
