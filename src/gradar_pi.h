@@ -419,6 +419,10 @@ private:
      void CacheSetToolbarToolBitmaps(int bm_id_normal, int bm_id_rollover);
 
      wxString         m_scanner_ip;
+     wxString         m_scanner_port;
+     wxString         m_multicast_group;
+     wxString         m_multicast_port;
+
      wxFileConfig     *m_pconfig;
      wxWindow         *m_parent_window;
      wxMenu           *m_pmenu;

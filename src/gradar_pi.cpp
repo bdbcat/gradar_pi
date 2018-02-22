@@ -693,11 +693,11 @@ int gradar_pi::Init(void)
      //    Create the control socket for the Radar
      wxIPV4address addr101;;
      addr101.AnyAddress();
-     addr101.Service(_T("50101"));     // does this matter?
+     addr101.Service(m_scanner_port);
      m_out_sock101 = new wxDatagramSocket(addr101, wxSOCKET_REUSEADDR | wxSOCKET_NOWAIT);
 
      //    Create the thread for Multicast radar data reception
-     m_pmcrxt = new MulticastRXThread(&m_mutex, _T("239.254.2.0"),_T("50100"));
+     m_pmcrxt = new MulticastRXThread(&m_mutex, m_multicast_group, m_multicast_port);
      if( m_pmcrxt->Run() != wxTHREAD_NO_ERROR ){
           delete m_pmcrxt;
           m_pmcrxt = NULL;
@@ -1639,6 +1639,11 @@ bool gradar_pi::LoadConfig(void)
 
      if(pConf) {
           pConf->SetPath ( _T( "/Plugins/GRadar" ) );
+          pConf->Read ( _T( "ScannerIP" ), &m_scanner_ip, _T("172.16.2.0") );
+          pConf->Read ( _T( "ScannerPort" ), &m_scanner_port, _T("50101") );
+          pConf->Read ( _T( "MulticastGroup" ), &m_multicast_group, _T("239.254.2.0") );
+          pConf->Read ( _T( "MulticastPort" ), &m_multicast_port, _T("50100") );
+
           pConf->Read ( _T( "GRadarOpMode" ),  &m_bmaster, 0 );
           pConf->Read ( _T( "GRadarDisplayMode" ),  &g_updatemode, 0 );
           pConf->Read ( _T( "GRadarTransparency" ),  &m_overlay_transparency, .50 );
@@ -1687,6 +1692,12 @@ bool gradar_pi::SaveConfig(void)
 
      if(pConf) {
           pConf->SetPath ( _T ( "/Plugins/GRadar" ) );
+
+          pConf->Write ( _T ( "ScannerIP" ), m_scanner_ip );
+          pConf->Write ( _T ( "ScannerPort" ), m_scanner_port );
+          pConf->Write ( _T ( "MulticastGroup" ), m_multicast_group );
+          pConf->Write ( _T ( "MulticastPort" ), m_multicast_port );
+
           pConf->Write ( _T ( "GRadarOpMode" ), m_bmaster );
           pConf->Write ( _T ( "GRadarDisplayMode" ), g_updatemode );
           pConf->Write ( _T ( "GRadarTransparency" ), m_overlay_transparency );
@@ -1761,7 +1772,7 @@ void gradar_pi::RadarTxOn(void)
 void gradar_pi::SendCommand(unsigned char *ppkt, unsigned int n_bytes)
 {
      wxIPV4address destaddr;
-     destaddr.Service(_T("50101"));
+     destaddr.Service(m_scanner_port);
      destaddr.Hostname(m_scanner_ip);
      m_out_sock101->SendTo(destaddr, ppkt, n_bytes);
 }
